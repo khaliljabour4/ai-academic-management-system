@@ -1,0 +1,1 @@
+# ai-academic-management-system
