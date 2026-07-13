@@ -1,0 +1,32 @@
+### Python / FastAPI (Ai_features/) ###
+Ai_features/.venv/
+Ai_features/venv/
+Ai_features/__pycache__/
+Ai_features/**/__pycache__/
+Ai_features/*.pyc
+Ai_features/.env
+Ai_features/*.egg-info/
+Ai_features/.pytest_cache/
+
+### Java / Spring Boot (backend/) ###
+backend/target/
+backend/.idea/
+backend/*.iml
+backend/.mvn/wrapper/maven-wrapper.jar
+backend/HELP.md
+backend/.env
+
+### Frontend (web_fronted/) ###
+web_fronted/node_modules/
+web_fronted/.env
+
+### IDE / OS files (can appear anywhere) ###
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+### General ###
+*.log
+.env
