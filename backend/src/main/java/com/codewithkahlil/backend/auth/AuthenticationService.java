@@ -16,15 +16,13 @@ import org.springframework.stereotype.Service;
 import java.net.PasswordAuthentication;
 
 @Service
-@AllArgsConstructor
-@NoArgsConstructor
 @RequiredArgsConstructor
 public class AuthenticationService {
 
-    private UserRepository repositpry ;
-    private PasswordEncoder passwordEncoder ;
-    private JwtService jwtService ;
-    private AuthenticationManager authenticationManager ;
+    private final UserRepository repositpry ;
+    private final PasswordEncoder passwordEncoder ;
+    private final JwtService jwtService ;
+    private final AuthenticationManager authenticationManager ;
 
     public AuthenticationResponse register(RegistreRequest request){
         var user = User.builder()
