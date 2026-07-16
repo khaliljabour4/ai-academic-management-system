@@ -1,0 +1,27 @@
+<!Doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles/login.css">
+  </head>
+  <body>
+    <div class="loginContainer">
+        <div  class="leftContainer">
+            <img alt="login image" src="resources\images\login.jpg" class="loginImage">
+        </div>
+        <div class="rightContainer">
+          <label>Login :</label>
+          <input type="text" id="username" class="username" placeholder="Enter your username">
+
+          <label>Password :</label>
+          <input type="password" id="password" class="password" placeholder="Enter your password">
+          <span class="eye" onclick="togglePassword()">👁️</span>
+
+          <button onclick="login()" id="loginButton" class="loginButton">
+            Login
+          </button>
+        </div>
+      </div>
+
+    <script src="script/login.js"></script>
+  </body>
+</html>
