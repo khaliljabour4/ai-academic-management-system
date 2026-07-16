@@ -13,6 +13,16 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+
+ /*ecxplanation : Lombok's @Data (which includes @EqualsAndHashCode) only
+ looks at fields declared in that specific class by default — it ignores
+ inherited fields. For Student extends Personne, that means without callSuper = true,
+  two different Student objects with different id/name (inherited from Personne)
+  but the same filiere/grades would be considered "equal." callSuper = true tells
+  Lombok to also include the parent's fields in the equality check — important for
+  entities where the inherited id is really what should distinguish two rows.*/
+
+
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder

@@ -42,10 +42,6 @@ public class Grade {
 
     private String semester;
 
-    /**
-     * Recomputes noteGenerale from whichever notes are present.
-     * Call this after setting note1/note2/note3/noteTp, before saving.
-     */
     public void computeNoteGenerale() {
         double sum = 0;
         int count = 0;

@@ -1,6 +1,8 @@
 package com.codewithkahlil.backend.model;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.*;
 
 /**
@@ -32,4 +34,10 @@ public class Module {
     @ManyToOne
     @JoinColumn(name = "filiere_id")
     private Filiere filiere;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "module", cascade = CascadeType.ALL, orphanRemoval = true)
+    //orphanremoval to true mean delete the message from the db if i delete them form list
+    //if it s not there he will just change the foreign keuy to null
+    private List<Conversation> conversations = new ArrayList<>();
 }

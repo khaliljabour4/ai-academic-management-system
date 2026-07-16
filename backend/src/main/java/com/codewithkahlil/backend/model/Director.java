@@ -19,5 +19,5 @@ import lombok.experimental.SuperBuilder;
 @DiscriminatorValue("DIRECTOR")
 public class Director extends Personne {
 
-    private String office;
+
 }
