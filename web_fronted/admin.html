@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="styles/admin.css">
+
+    </head>
+    <body>
+
+        <navbar>
+            <button id="burgerMenuBtn" class="burger-menu-btn" ">
+              <img src="resources\images\BurgerMenu.png">
+            </button>
+
+            <div class="sidebar" id="sidebar">
+                
+            </div>
+
+            <main>
+              <div class="creation-filiere">
+                <h1>ajouter un filier</h1>
+                <div>
+                  <label style="display:block">Nom de filiere</label>
+                  <input id="filierName" type="text" placeholder="Entrer le nom de la filiere" style="width: 350px; margin-top: 10px;">
+                </div>
+
+                <div>
+                  <label style="display:block">Description de filiere</label>
+                  <textarea id="filiereDescription" class="filiere-description" type="text" placeholder="Entrer la description de la filiere"></textarea>
+                </div>
+                  
+                <button class="creation-filiere-submit-btn" id="filiereCreationSubmitBtn">
+                  Enregistrer
+                </button>
+                
+              </div>
+            </main>
+        </navbar> 
+
+        <script type="module" src ="script/utile.js"></script>
+        <script type="module" src ="script/admin.js"></script>
+    </body>
+</html>
+

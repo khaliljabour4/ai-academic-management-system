@@ -3,9 +3,6 @@ async function login(){
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
 
-    console.log(username + " " + password) ;
-
-
     try{
         const response = await fetch("http://localhost:8080/api/v1/auth/authenticate" ,
             {
@@ -18,18 +15,25 @@ async function login(){
         });
 
         if(!response.ok){
-            console.log("acces denied");
+            console.log("access denied");
             return ; 
         }else{
-            console.log("acces giving");
+            console.log("access giving");
         }
 
         const  data = await response.json() ;
         console.log("token :" + data.token) ;
+        console.log("token :" + data.role) ;
 
-        localStorage.setItem("jwt", data.token);
-        alert("Login successful!");
+        localStorage.setItem("jwt","Bearer " + data.token);
+        localStorage.setItem("role", data.role);
 
+        switch(data.role){
+            case "Director" : window.location.href="director.html";break;
+            case "Student" : window.location.href="student.html";break;
+            case "Administrator" : window.location.href="admin.html";break;
+            case "Professor" : window.location.href="professor.html";break;
+        }
     }
     catch(error){
         console.error(error);

@@ -24,7 +24,8 @@ public class Filiere {
 
     private String name;
 
-    private int year;
+    @Column(columnDefinition = "TEXT")
+    private String description ;
 
     @Builder.Default
     @OneToMany(mappedBy = "filiere")
