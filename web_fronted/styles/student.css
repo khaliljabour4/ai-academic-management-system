@@ -1,0 +1,12 @@
+/* Page-specific tweaks for the Student dashboard.
+   Everything shared (sidebar, cards, tables, chat, schedule grid)
+   lives in theme.css */
+
+.app-avatar {
+  background: var(--color-ai);
+}
+
+.app-sidebar-role {
+  color: var(--color-ai);
+  font-weight: 600;
+}

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>School System</title>
+    <link rel="stylesheet" href="styles/theme.css">
+    <style>
+        body {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .loading-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--color-primary);
+            animation: pulse 1s infinite ease-in-out;
+        }
+        @keyframes pulse { 50% { opacity: 0.3; transform: scale(0.8); } }
+    </style>
+</head>
+<body>
+    <div class="loading-dot"></div>
+
+    <script type="module">
+        const token = localStorage.getItem("jwt");
+        const role = localStorage.getItem("role");
+
+        if (!token || !role) {
+            window.location.href = "login.html";
+        } else {
+            switch (role) {
+                case "Director": window.location.href = "director.html"; break;
+                case "Administrator": window.location.href = "admin.html"; break;
+                case "Professor": window.location.href = "professor.html"; break;
+                case "Student": window.location.href = "student.html"; break;
+                default: window.location.href = "login.html";
+            }
+        }
+    </script>
+</body>
+</html>

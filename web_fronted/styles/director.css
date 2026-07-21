@@ -1,0 +1,7 @@
+/* Page-specific tweaks for the Director dashboard.
+   Everything shared (sidebar, cards, tables, AI panel) lives in theme.css */
+
+.app-sidebar-role {
+  color: var(--color-primary-dark);
+  font-weight: 600;
+}

@@ -1,26 +1,42 @@
-<!Doctype html>
-<html>
-  <head>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion — School System</title>
+    <link rel="stylesheet" href="styles/theme.css">
     <link rel="stylesheet" href="styles/login.css">
-  </head>
-  <body>
-    <div class="loginContainer">
-        <div  class="leftContainer">
-            <img alt="login image" src="resources\images\login.jpg" class="loginImage">
-        </div>
-        <div class="rightContainer">
-          <label>Login :</label>
-          <input type="text" id="username" class="username" placeholder="Enter your username">
+</head>
+<body>
+    <div class="login-page">
+        <div class="login-card">
+            <div class="login-image">
+                <img alt="login" src="resources\images\login.jpg">
+                <div class="login-image-overlay">
+                    <span class="brand-dot"></span>
+                    <span>School System</span>
+                </div>
+            </div>
+            <div class="login-form">
+                <h1>Bienvenue 👋</h1>
+                <p class="login-subtitle">Connecte-toi pour accéder à ton espace</p>
 
-          <label>Password :</label>
-          <input type="password" id="password" class="password" placeholder="Enter your password">
+                <div class="form-field">
+                    <label>Email</label>
+                    <input type="text" id="username" placeholder="ton.email@exemple.com">
+                </div>
 
-          <button onclick="login()" id="loginButton" class="loginButton">
-            Login
-          </button>
+                <div class="form-field">
+                    <label>Mot de passe</label>
+                    <input type="password" id="password" placeholder="••••••••">
+                </div>
+
+                <button onclick="login()" id="loginButton" class="btn btn-primary login-submit-btn">
+                    Se connecter
+                </button>
+            </div>
         </div>
-      </div>
+    </div>
 
     <script src="script/login.js"></script>
-  </body>
+</body>
 </html>

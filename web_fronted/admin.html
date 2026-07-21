@@ -1,58 +1,245 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <link rel="stylesheet" href="styles/admin.css">
-
-    </head>
-    <body>
-
-        <navbar>
-            <button id="burgerMenuBtn" class="burger-menu-btn" ">
-              <img src="resources\images\BurgerMenu.png">
-            </button>
-
-            <div class="sidebar" id="sidebar">
-              <button class="close-sidebar-button"  id="closeMenuBtn">
-                <img src="resources/images/close.png" >
-              </button>
-              <button class="sidebar-button" id="sidebarCreatioinFiliereBtn">Creeer un filiere</button>
-              <button class="sidebar-button" id="sidebarCreationProfBtn">Creeer un professeur </button>
-              <button class="sidebar-button" id="sidebarcreerEtudiantBtn">Ajouter un nouveau etudiant</button>
-              <button class="sidebar-button" id="sidebarOverviewBtn">Overview un filiere</button>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="styles/theme.css">
+    <link rel="stylesheet" href="styles/admin.css">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="app-sidebar" id="sidebar">
+            <div class="app-sidebar-brand">
+                <span class="brand-dot"></span>
+                <span>School System</span>
             </div>
+            <div class="app-sidebar-role">Administrator</div>
 
-            <main>
-              <div class="creation-filiere">
-                <h1>ajouter un filier</h1>
-                <div>
-                  <label style="display:block">Nom de filiere</label>
-                  <input id="filierName" type="text" placeholder="Entrer le nom de la filiere" style="width: 350px; margin-top: 10px;">
-                </div>
-
-                <div>
-                  <label style="display:block">Description de filiere</label>
-                  <textarea id="filiereDescription" class="filiere-description" type="text" placeholder="Entrer la description de la filiere"></textarea>
-                </div>
-                  
-                <button class="creation-filiere-submit-btn" id="filiereCreationSubmitBtn">
-                  Enregistrer
+            <nav class="app-nav">
+                <button class="app-nav-btn active" id="sidebarCreatioinFiliereBtn" data-target="filieres">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M6 10.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-5.5"/></svg>
+                    Filières
                 </button>
-                
-              </div>
+                <button class="app-nav-btn" id="sidebarCreationProfBtn" data-target="professors">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+                    Professeurs
+                </button>
+                <button class="app-nav-btn" id="sidebarcreerEtudiantBtn" data-target="students">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2 21c0-3.6 3-6 7-6s7 2.4 7 6"/><path d="M16.5 5c1.7.3 3 1.8 3 3.5S18.2 11.7 16.5 12"/><path d="M22 21c0-2.8-1.9-5-4.8-5.7"/></svg>
+                    Étudiants
+                </button>
+                <button class="app-nav-btn" id="sidebarCreerModuleBtn" data-target="modules">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg>
+                    Modules
+                </button>
+                <button class="app-nav-btn" id="sidebarOverviewBtn" data-target="overview">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+                    Overview
+                </button>
+            </nav>
 
+            <div class="app-sidebar-footer">
+                <button class="app-logout-btn" id="logoutBtn">Se déconnecter</button>
+            </div>
+        </aside>
 
-              <div class="creation-prof"></div>
+        <div class="app-main">
+            <header class="app-header">
+                <div class="app-header-left">
+                    <button class="app-burger-btn" id="burgerMenuBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h18"/></svg>
+                    </button>
+                    <div class="app-header-title" id="pageTitle">Filières</div>
+                </div>
+                <div class="app-header-right">
+                    <div class="app-avatar">A</div>
+                </div>
+            </header>
 
+            <main class="app-content">
 
-              <div class="creation-etudiant"></div>
+                <!-- ===== FILIERES ===== -->
+                <section class="app-section active creation-filiere" id="filieres">
+                    <div class="section-heading">
+                        <div>
+                            <h1>Filières</h1>
+                            <p>Créer et gérer les filières</p>
+                        </div>
+                    </div>
 
+                    <div class="admin-split">
+                        <div class="card">
+                            <div class="card-title">Liste des filières</div>
+                            <table class="data-table" id="tableRows" style="max-width: 500px;"></table>
+                        </div>
 
-              <div class="overview"></div>
+                        <div class="card">
+                            <div class="card-title">Ajouter une filière</div>
+                            <div class="form-field">
+                                <label>Nom de filière</label>
+                                <input id="filierName" type="text" placeholder="Ex: Génie Informatique">
+                            </div>
+                            <div class="form-field">
+                                <label>Description</label>
+                                <textarea id="filiereDescription" class="filiere-description" placeholder="Décris brièvement la filière"></textarea>
+                            </div>
+                            <button class="btn btn-primary" id="filiereCreationSubmitBtn" style="margin-top:14px;">Enregistrer</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===== PROFESSORS ===== -->
+                <section class="app-section creation-prof" id="professors">
+                    <div class="section-heading">
+                        <div>
+                            <h1>Professeurs</h1>
+                            <p>Créer et gérer les comptes professeur</p>
+                        </div>
+                    </div>
+
+                    <div class="admin-split">
+                        <div class="card">
+                            <div class="card-title">Liste des professeurs</div>
+                            <table class="data-table" id="profTableRows"></table>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-title">Ajouter un professeur</div>
+                            <div class="form-field">
+                                <label>Nom complet</label>
+                                <input id="profLastName" type="text" placeholder="Entrer le prenom">
+                            </div>
+                            <div class="form-field">
+                                <label>Nom complet</label>
+                                <input id="profFirstName" type="text" placeholder="Entrer le nom">
+                            </div>
+                            <div class="form-field">
+                                <label>Mot de passe</label>
+                                <input id="profPassword" type="password">
+                            </div>
+                            <div class="form-field">
+                                <label>Filière</label>
+                                <select id="profFiliere"></select>
+                            </div>
+                            <button id="createProfBtn" class="btn btn-primary" style="margin-top:14px;">Enregistrer</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===== STUDENTS ===== -->
+                <section class="app-section creation-etudiant" id="students">
+                    <div class="section-heading">
+                        <div>
+                            <h1>Étudiants</h1>
+                            <p>Créer et gérer les comptes étudiant</p>
+                        </div>
+                    </div>
+
+                    <div class="admin-split">
+                        <div class="card">
+                            <div class="card-title">Liste des étudiants</div>
+                            <table class="data-table" id="studentTableRows"></table>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-title">Ajouter un étudiant</div>
+                            <div class="form-field">
+                                <label>Nom complet</label>
+                                <input id="studentName" type="text">
+                            </div>
+                            <div class="form-field">
+                                <label>Email</label>
+                                <input id="studentEmail" type="email">
+                            </div>
+                            <div class="form-field">
+                                <label>Mot de passe</label>
+                                <input id="studentPassword" type="password">
+                            </div>
+                            <div class="form-field">
+                                <label>CNE</label>
+                                <input id="studentCNE" type="text">
+                            </div>
+                            <div class="form-field">
+                                <label>Filière</label>
+                                <select id="studentFiliere"></select>
+                            </div>
+                            <button id="createStudentBtn" class="btn btn-primary" style="margin-top:14px;">Enregistrer</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===== MODULES ===== -->
+                <section class="app-section creation-module" id="modules">
+                    <div class="section-heading">
+                        <div>
+                            <h1>Modules</h1>
+                            <p>Créer et gérer les modules</p>
+                        </div>
+                    </div>
+
+                    <div class="admin-split">
+                        <div class="card">
+                            <div class="card-title">Liste des modules</div>
+                            <table class="data-table" id="moduleTableRows"></table>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-title">Ajouter un module</div>
+                            <div class="form-field">
+                                <label>Nom du module</label>
+                                <input id="moduleName" type="text">
+                            </div>
+                            <div class="form-field">
+                                <label>Semestre</label>
+                                <select id="semester">
+                                    <option>S1</option><option>S2</option><option>S3</option>
+                                    <option>S4</option><option>S5</option><option>S6</option>
+                                </select>
+                            </div>
+                            <div class="form-field">
+                                <label>Professeur</label>
+                                <select id="moduleProfessor"></select>
+                            </div>
+                            <div class="form-field">
+                                <label>Filière</label>
+                                <select id="moduleFiliere"></select>
+                            </div>
+                            <button id="createModuleBtn" class="btn btn-primary" style="margin-top:14px;">Enregistrer</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===== OVERVIEW ===== -->
+                <section class="app-section overview" id="overview">
+                    <div class="section-heading">
+                        <div>
+                            <h1>Overview</h1>
+                            <p>Vue détaillée par filière</p>
+                        </div>
+                        <select id="overviewFiliere" style="min-width:220px;"></select>
+                    </div>
+
+                    <div class="overview-content">
+                        <div class="card">
+                            <div class="card-title">Professeurs</div>
+                            <table class="data-table" id="overviewProfessorTable"></table>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">Étudiants</div>
+                            <table class="data-table" id="overviewStudentTable"></table>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">Modules</div>
+                            <table class="data-table" id="overviewModuleTable"></table>
+                        </div>
+                    </div>
+                </section>
+
             </main>
-        </navbar> 
+        </div>
+    </div>
 
-        <script type="module" src ="script/utile.js"></script>
-        <script type="module" src ="script/admin.js"></script>
-    </body>
+    <script type="module" src="script/utile.js"></script>
+    <script type="module" src="script/admin.js"></script>
+</body>
 </html>
-

@@ -1,65 +1,75 @@
-body ,html{
-    height : 100% ;
-    width : 100% ; 
-    padding : 0;
-    margin : 0;
-}
-body{
+.login-page {
+    height: 100vh;
+    width: 100%;
     display: flex;
-    justify-content: center;
     align-items: center;
-}
-
-.loginContainer{
-    display: grid;
-    width : 70% ;
-    grid-template-columns: 1fr 1fr;
     justify-content: center;
-
+    background: radial-gradient(circle at top left, #eaf4ff 0%, var(--color-bg) 55%);
 }
 
+.login-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: min(880px, 92vw);
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
 
-.loginImage {
+.login-image {
+    position: relative;
+}
 
-    height : 100% ; 
-    width : 100% ; 
-    border-radius: 20px 0 0 20px;
+.login-image img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
+    display: block;
 }
 
-.rightContainer{
-    border: 3px solid rgb(0, 136, 255);
-    border-left : none ; 
-    border-radius: 0 20px 20px 0 ;
+.login-image-overlay {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.92);
+    padding: 8px 14px;
+    border-radius: var(--radius-pill);
+    font-weight: 700;
+    font-size: 14px;
+    box-shadow: var(--shadow-sm);
+}
+
+.login-form {
     display: flex;
     flex-direction: column;
-    padding: 30px 50px;
+    justify-content: center;
+    gap: 14px;
+    padding: 48px 44px;
 }
 
-.rightContainer label{
-    margin-top : 20px;
-    padding-left: 5px;
-    margin-bottom : 3px ;
+.login-form h1 {
+    margin: 0;
+    font-size: 26px;
 }
 
-.rightContainer input{
-    border : 2px solid rgb(0, 136, 255) ;
-    padding: 8px 5px;
-    border-radius: 15px;
+.login-subtitle {
+    margin: 0 0 10px;
+    color: var(--color-text-muted);
+    font-size: 14px;
 }
 
-.loginButton{
-    margin : 40px 10px ;
-    border : 2px solid rgb(0, 136, 255) ;
-    padding: 10px 0;
-    background-color: white;
-    border-radius: 25px;
+.login-submit-btn {
+    margin-top: 14px;
+    padding: 12px 0;
+    border-radius: var(--radius-pill);
+    font-size: 15px;
 }
 
-.loginButton:hover{
-    background-color: rgb(0, 136, 255);
-    border-color: none ;
-    color : white ;
-    font-size: 16px;
-    padding: 9px 0;
+@media (max-width: 720px) {
+    .login-card { grid-template-columns: 1fr; }
+    .login-image { display: none; }
 }

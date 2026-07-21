@@ -24,6 +24,7 @@ import java.util.List;
 @DiscriminatorValue("PROFESSOR")
 public class Professor extends Personne {
 
+    private String number  ;
     @Builder.Default
     @OneToMany(mappedBy = "teacher")
     private List<Module> modules = new ArrayList<>();

@@ -1,11 +1,158 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        
-    </head>
-    <body>
-        <script type="module" src ="script/utile.js"></script>
-        <script type="module" src ="script/student.js"></script>
-    </body>
-</html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="styles/theme.css">
+    <link rel="stylesheet" href="styles/student.css">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="app-sidebar" id="sidebar">
+            <div class="app-sidebar-brand">
+                <span class="brand-dot"></span>
+                <span>School System</span>
+            </div>
+            <div class="app-sidebar-role">Student</div>
 
+            <nav class="app-nav">
+                <button class="app-nav-btn active" data-target="dashboard">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+                    Dashboard
+                </button>
+                <button class="app-nav-btn" data-target="schedule">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 2v4"/><path d="M16 2v4"/></svg>
+                    Emploi du temps
+                </button>
+                <button class="app-nav-btn" data-target="modules">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg>
+                    Modules &amp; Résumés
+                </button>
+                <button class="app-nav-btn" data-target="ai-assistant">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.9 8.4 8.5 8.5 0 0 1-3.8-.9L3 20l1.1-5.3A8.4 8.4 0 1 1 21 11.5Z"/></svg>
+                    Assistant IA
+                </button>
+            </nav>
+
+            <div class="app-sidebar-footer">
+                <button class="app-logout-btn" id="logoutBtn">Se déconnecter</button>
+            </div>
+        </aside>
+
+        <div class="app-main">
+            <header class="app-header">
+                <div class="app-header-left">
+                    <button class="app-burger-btn" id="burgerMenuBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h18"/></svg>
+                    </button>
+                    <div class="app-header-title" id="pageTitle">Dashboard</div>
+                </div>
+                <div class="app-header-right">
+                    <div class="app-avatar">S</div>
+                </div>
+            </header>
+
+            <main class="app-content">
+
+                <section class="app-section active" id="dashboard">
+                    <div class="section-heading">
+                        <div>
+                            <h1>Bonjour 👋</h1>
+                            <p>Résumé rapide de ta semaine</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Modules ce semestre</div>
+                            <div class="stat-value" id="statModuleCount">–</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Moyenne générale</div>
+                            <div class="stat-value" id="statAverage">–</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Assiduité</div>
+                            <div class="stat-value" id="statAttendance">–</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">Prochains cours</div>
+                        <div class="empty-state" id="upcomingEmpty">
+                            Va dans <strong>Emploi du temps</strong> pour voir ta semaine complète.
+                        </div>
+                    </div>
+                </section>
+
+                <section class="app-section" id="schedule">
+                    <div class="section-heading">
+                        <div>
+                            <h1>Emploi du temps</h1>
+                            <p>Ta semaine, filière incluse</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="schedule-grid" id="scheduleGrid">
+                            <div></div>
+                            <div class="schedule-cell-head">Lun</div>
+                            <div class="schedule-cell-head">Mar</div>
+                            <div class="schedule-cell-head">Mer</div>
+                            <div class="schedule-cell-head">Jeu</div>
+                            <div class="schedule-cell-head">Ven</div>
+                            <div class="schedule-cell-head">Sam</div>
+                            <!-- rows injected by student.js -->
+                        </div>
+                    </div>
+                </section>
+
+                <section class="app-section" id="modules">
+                    <div class="section-heading">
+                        <div>
+                            <h1>Modules &amp; Résumés</h1>
+                            <p>Notes et résumé de cours générés par IA (à venir)</p>
+                        </div>
+                    </div>
+
+                    <div class="card" id="modulesList">
+                        <div class="empty-state">Chargement…</div>
+                    </div>
+                </section>
+
+                <section class="app-section" id="ai-assistant">
+                    <div class="section-heading">
+                        <div>
+                            <h1>Assistant IA</h1>
+                            <p>Une conversation par sujet, par module</p>
+                        </div>
+                        <select id="moduleSelect" style="min-width:220px;"></select>
+                    </div>
+
+                    <div class="chat-shell">
+                        <div class="chat-thread-list" id="threadList">
+                            <div class="empty-state">Choisis un module</div>
+                        </div>
+                        <div class="chat-window">
+                            <div class="chat-messages" id="chatMessages">
+                                <div class="empty-state">
+                                    L'assistant n'est pas encore branché à un LLM.<br>
+                                    L'UI et le stockage des conversations sont prêts côté backend (<code>Conversation</code> / <code>Message</code>).
+                                </div>
+                            </div>
+                            <div class="chat-input-row">
+                                <input type="text" id="chatInput" placeholder="Pose une question sur ce module...">
+                                <button class="btn btn-primary" id="chatSendBtn">Envoyer</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <script type="module" src="script/utile.js"></script>
+    <script type="module" src="script/student.js"></script>
+</body>
+</html>

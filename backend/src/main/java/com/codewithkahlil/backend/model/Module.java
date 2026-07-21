@@ -1,6 +1,8 @@
 package com.codewithkahlil.backend.model;
 
 import jakarta.persistence.*;
+
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.*;
@@ -24,8 +26,6 @@ public class Module {
 
     private String name;
 
-    @Builder.Default
-    private boolean hasTp = false;
 
     @ManyToOne
     @JoinColumn(name = "teacher_id")
@@ -37,7 +37,11 @@ public class Module {
 
     @Builder.Default
     @OneToMany(mappedBy = "module", cascade = CascadeType.ALL, orphanRemoval = true)
-    //orphanremoval to true mean delete the message from the db if i delete them form list
-    //if it s not there he will just change the foreign keuy to null
     private List<Conversation> conversations = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    private DayOfWeek dayOfWeek;
+
+    @Enumerated(EnumType.STRING)
+    private TimeSlot timeSlot;
 }

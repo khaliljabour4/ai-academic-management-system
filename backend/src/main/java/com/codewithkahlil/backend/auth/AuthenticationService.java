@@ -29,10 +29,9 @@ public class AuthenticationService {
 
     public AuthenticationResponse register(RegistreRequest request){
         var user = User.builder()
-                .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.Student)
+                .role(request.getRole())
                 .build();
 
         repositpry.save(user);
@@ -48,8 +47,7 @@ public class AuthenticationService {
                         request.getPassword())
         );
 
-        var user = repositpry.findUserByEmail(request.getEmail())
-                .orElseThrow();
+        var user = repositpry.findUserByEmail(request.getEmail());
         var jwtToken = jwtService.generateToken(user);
 
         Role role = user.getRole() ;
