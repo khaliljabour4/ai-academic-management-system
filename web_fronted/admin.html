@@ -144,16 +144,16 @@
                         <div class="card">
                             <div class="card-title">Ajouter un étudiant</div>
                             <div class="form-field">
-                                <label>Nom complet</label>
-                                <input id="studentName" type="text">
+                                <label>Nom </label>
+                                <input id="studentLastName" type="text">
                             </div>
                             <div class="form-field">
-                                <label>Email</label>
-                                <input id="studentEmail" type="email">
+                                <label>Prenom</label>
+                                <input id="studentFirstName" type="text">
                             </div>
                             <div class="form-field">
-                                <label>Mot de passe</label>
-                                <input id="studentPassword" type="password">
+                                <label>CNI</label>
+                                <input id="studentCNI" type="text">
                             </div>
                             <div class="form-field">
                                 <label>CNE</label>
@@ -190,11 +190,8 @@
                                 <input id="moduleName" type="text">
                             </div>
                             <div class="form-field">
-                                <label>Semestre</label>
-                                <select id="semester">
-                                    <option>S1</option><option>S2</option><option>S3</option>
-                                    <option>S4</option><option>S5</option><option>S6</option>
-                                </select>
+                                <label>Description</label>
+                                <input id="moduleDesc" type="text">
                             </div>
                             <div class="form-field">
                                 <label>Professeur</label>
@@ -204,6 +201,27 @@
                                 <label>Filière</label>
                                 <select id="moduleFiliere"></select>
                             </div>
+                            <div class="form-field">
+                                <label>Day</label>
+                                <select id="dayOfWeek">
+                                    <option value="Monday">Monday</option>
+                                    <option value="Tuesday">Tuesday</option>
+                                    <option value="Wednesday">Wednesday</option>
+                                    <option value="Thursday">Thursday</option>
+                                    <option value="Friday">Friday</option>
+                                    <option value="Saturday">Saturday</option>
+                                </select>
+                            </div>
+
+                            <div class="form-field">
+                                <label>TImeslot</label>
+                                <select id="timeSlot">
+                                    <option value="MORNING">MORNING</option>
+                                    <option value="AFTERNOON">AFTERNOON</option>
+                                </select>
+                            </div>
+
+                            
                             <button id="createModuleBtn" class="btn btn-primary" style="margin-top:14px;">Enregistrer</button>
                         </div>
                     </div>
@@ -221,16 +239,12 @@
 
                     <div class="overview-content">
                         <div class="card">
-                            <div class="card-title">Professeurs</div>
-                            <table class="data-table" id="overviewProfessorTable"></table>
+                            <div class="card-title"> Modules - Professeurs</div>
+                            <table class="data-table" id="overviewProfessorModuleTable"></table>
                         </div>
                         <div class="card">
                             <div class="card-title">Étudiants</div>
                             <table class="data-table" id="overviewStudentTable"></table>
-                        </div>
-                        <div class="card">
-                            <div class="card-title">Modules</div>
-                            <table class="data-table" id="overviewModuleTable"></table>
                         </div>
                     </div>
                 </section>

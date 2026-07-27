@@ -6,6 +6,12 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * One AI conversation thread for a student, on a module.
+ * messages is a flat, ordered list of strings: question, response,
+ * question, response... (even index = question, odd index = response).
+ * Simpler than a separate Message entity - one column, no extra table.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,16 +35,15 @@ public class Conversation {
     private Module module;
 
     @Builder.Default
-    @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ElementCollection
+    @CollectionTable(name = "conversation_messages", joinColumns = @JoinColumn(name = "conversation_id"))
     @OrderColumn(name = "message_order")
-    private List<Message> messages = new ArrayList<>();
+    @Column(name = "content", columnDefinition = "TEXT")
+    private List<String> messages = new ArrayList<>();
 
+    /** Appends one question then its response, keeping order. */
     public void addMessage(String question, String response) {
-        Message message = Message.builder()
-                .question(question)
-                .response(response)
-                .conversation(this)
-                .build();
-        messages.add(message);
+        messages.add(question);
+        messages.add(response);
     }
 }

@@ -16,17 +16,17 @@
             <div class="app-sidebar-role">Student</div>
 
             <nav class="app-nav">
-                <button class="app-nav-btn active" data-target="dashboard">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
-                    Dashboard
-                </button>
-                <button class="app-nav-btn" data-target="schedule">
+                <button class="app-nav-btn active" data-target="schedule">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 2v4"/><path d="M16 2v4"/></svg>
                     Emploi du temps
                 </button>
                 <button class="app-nav-btn" data-target="modules">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg>
-                    Modules &amp; Résumés
+                    Modules
+                </button>
+                <button class="app-nav-btn" data-target="grades">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    Notes
                 </button>
                 <button class="app-nav-btn" data-target="ai-assistant">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.9 8.4 8.5 8.5 0 0 1-3.8-.9L3 20l1.1-5.3A8.4 8.4 0 1 1 21 11.5Z"/></svg>
@@ -45,7 +45,7 @@
                     <button class="app-burger-btn" id="burgerMenuBtn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h18"/></svg>
                     </button>
-                    <div class="app-header-title" id="pageTitle">Dashboard</div>
+                    <div class="app-header-title" id="pageTitle">Emploi du temps</div>
                 </div>
                 <div class="app-header-right">
                     <div class="app-avatar">S</div>
@@ -54,38 +54,8 @@
 
             <main class="app-content">
 
-                <section class="app-section active" id="dashboard">
-                    <div class="section-heading">
-                        <div>
-                            <h1>Bonjour 👋</h1>
-                            <p>Résumé rapide de ta semaine</p>
-                        </div>
-                    </div>
-
-                    <div class="stat-grid">
-                        <div class="stat-card">
-                            <div class="stat-label">Modules ce semestre</div>
-                            <div class="stat-value" id="statModuleCount">–</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Moyenne générale</div>
-                            <div class="stat-value" id="statAverage">–</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Assiduité</div>
-                            <div class="stat-value" id="statAttendance">–</div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-title">Prochains cours</div>
-                        <div class="empty-state" id="upcomingEmpty">
-                            Va dans <strong>Emploi du temps</strong> pour voir ta semaine complète.
-                        </div>
-                    </div>
-                </section>
-
-                <section class="app-section" id="schedule">
+                <!-- ===== SCHEDULE ===== -->
+                <section class="app-section active" id="schedule">
                     <div class="section-heading">
                         <div>
                             <h1>Emploi du temps</h1>
@@ -102,24 +72,63 @@
                             <div class="schedule-cell-head">Jeu</div>
                             <div class="schedule-cell-head">Ven</div>
                             <div class="schedule-cell-head">Sam</div>
-                            <!-- rows injected by student.js -->
+                            <!-- JS: append one .schedule-slot-label + 6x .schedule-cell(.filled) per time slot -->
                         </div>
                     </div>
                 </section>
 
+                <!-- ===== MODULES (with course description added by the professor) ===== -->
                 <section class="app-section" id="modules">
                     <div class="section-heading">
                         <div>
-                            <h1>Modules &amp; Résumés</h1>
-                            <p>Notes et résumé de cours générés par IA (à venir)</p>
+                            <h1>Modules</h1>
+                            <p>Description du cours ajoutée par le professeur</p>
                         </div>
                     </div>
 
-                    <div class="card" id="modulesList">
-                        <div class="empty-state">Chargement…</div>
+                    <div id="modulesList">
+                        <!-- JS: repeat this .module-card block per module -->
+                        <div class="module-card">
+                            <div class="module-card-head">
+                                <h3>Nom du module</h3>
+                                <span class="badge badge-success">Prof. Nom Prénom</span>
+                            </div>
+                            <p class="module-card-desc">
+                                La description du cours écrite par le professeur s'affichera ici.
+                            </p>
+                        </div>
                     </div>
                 </section>
 
+                <!-- ===== GRADES ===== -->
+                <section class="app-section" id="grades">
+                    <div class="section-heading">
+                        <div>
+                            <h1>Notes</h1>
+                            <p>Tes notes par module, ce semestre</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <table class="data-table" id="gradesTable">
+                            <thead>
+                                <tr>
+                                    <th>Module</th>
+                                    <th>Note 1</th>
+                                    <th>Note 2</th>
+                                    <th>Note 3</th>
+                                    <th>TP</th>
+                                    <th>Moyenne</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gradesTableBody">
+                                <!-- JS: fill rows here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- ===== AI ASSISTANT ===== -->
                 <section class="app-section" id="ai-assistant">
                     <div class="section-heading">
                         <div>
@@ -131,14 +140,11 @@
 
                     <div class="chat-shell">
                         <div class="chat-thread-list" id="threadList">
-                            <div class="empty-state">Choisis un module</div>
+                            <!-- JS: one .chat-thread-item button per conversation -->
                         </div>
                         <div class="chat-window">
                             <div class="chat-messages" id="chatMessages">
-                                <div class="empty-state">
-                                    L'assistant n'est pas encore branché à un LLM.<br>
-                                    L'UI et le stockage des conversations sont prêts côté backend (<code>Conversation</code> / <code>Message</code>).
-                                </div>
+                                <!-- JS: one .chat-bubble.question / .chat-bubble.response per message -->
                             </div>
                             <div class="chat-input-row">
                                 <input type="text" id="chatInput" placeholder="Pose une question sur ce module...">

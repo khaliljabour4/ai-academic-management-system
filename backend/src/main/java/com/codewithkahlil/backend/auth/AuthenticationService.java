@@ -28,6 +28,7 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager ;
 
     public AuthenticationResponse register(RegistreRequest request){
+        assert passwordEncoder != null;
         var user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -37,7 +38,10 @@ public class AuthenticationService {
         repositpry.save(user);
          var jwtToken = jwtService.generateToken(user);
 
-        return  AuthenticationResponse.builder().token(jwtToken).build() ;
+        return  AuthenticationResponse.builder()
+                .token(jwtToken)
+                .role(user.getRole())
+                .build() ;
     }
 
     public AuthenticationResponse authenticate(AuthenticateRequest request){
@@ -54,7 +58,7 @@ public class AuthenticationService {
 
         return  AuthenticationResponse.builder()
                 .token(jwtToken)
-                .role(String.valueOf(role))
+                .role(role)
                 .build() ;
     }
 }

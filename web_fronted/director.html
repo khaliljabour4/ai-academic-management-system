@@ -20,21 +20,13 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
                     Overview
                 </button>
-                <button class="app-nav-btn" data-target="filieres">
+                <button class="app-nav-btn" data-target="by-filiere">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M6 10.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-5.5"/></svg>
-                    Filières
+                    Par filière
                 </button>
-                <button class="app-nav-btn" data-target="professors">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
-                    Professeurs
-                </button>
-                <button class="app-nav-btn" data-target="students">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2 21c0-3.6 3-6 7-6s7 2.4 7 6"/><path d="M16.5 5c1.7.3 3 1.8 3 3.5S18.2 11.7 16.5 12"/><path d="M22 21c0-2.8-1.9-5-4.8-5.7"/></svg>
-                    Étudiants
-                </button>
-                <button class="app-nav-btn" data-target="ai-insights">
+                <button class="app-nav-btn" data-target="ml-dashboard">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.9 4.9l2.8 2.8"/><path d="M16.3 16.3l2.8 2.8"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.9 19.1l2.8-2.8"/><path d="M16.3 7.7l2.8-2.8"/><circle cx="12" cy="12" r="3.2"/></svg>
-                    AI &amp; ML Insights
+                    Dashboard IA/ML
                 </button>
             </nav>
 
@@ -58,6 +50,7 @@
 
             <main class="app-content">
 
+                <!-- ===== OVERVIEW ===== -->
                 <section class="app-section active" id="overview">
                     <div class="section-heading">
                         <div>
@@ -66,7 +59,7 @@
                         </div>
                     </div>
 
-                    <div class="stat-grid" id="statGrid">
+                    <div class="stat-grid">
                         <div class="stat-card">
                             <div class="stat-label">Filières</div>
                             <div class="stat-value" id="statFilieres">–</div>
@@ -80,103 +73,111 @@
                             <div class="stat-value" id="statStudents">–</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-label">Taux de réussite estimé</div>
-                            <div class="stat-value">— <span class="badge badge-ai">bientôt IA</span></div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-title">Étudiants à risque</div>
-                        <div class="empty-state">
-                            Le modèle de prédiction n'est pas encore branché.<br>
-                            Voir la section <strong>AI &amp; ML Insights</strong> pour l'activer.
+                            <div class="stat-label">Moyenne générale</div>
+                            <div class="stat-value" id="statAverage">–</div>
                         </div>
                     </div>
                 </section>
 
-                <section class="app-section" id="filieres">
+                <!-- ===== BY FILIERE: students + grades per class ===== -->
+                <section class="app-section" id="by-filiere">
                     <div class="section-heading">
                         <div>
-                            <h1>Filières</h1>
-                            <p>Chaque filière regroupe ses modules, professeurs et étudiants</p>
+                            <h1>Par filière</h1>
+                            <p>Étudiants et notes, filière par filière</p>
                         </div>
-                        <button class="btn btn-primary" id="refreshFilieresBtn">Actualiser</button>
+                        <select id="filiereOverviewSelect" style="min-width:220px;"></select>
                     </div>
 
                     <div class="card">
-                        <table class="data-table">
+                        <div class="card-title">Étudiants &amp; moyennes</div>
+                        <table class="data-table" id="filiereStudentsTable">
                             <thead>
                                 <tr>
                                     <th>Nom</th>
-                                    <th>Description</th>
-                                    <th>Modules</th>
-                                    <th>Étudiants</th>
-                                    <th></th>
+                                    <th>Prénom</th>
+                                    <th>CNE</th>
+                                    <th>Moyenne générale</th>
                                 </tr>
                             </thead>
-                            <tbody id="filiereTableBody">
-                                <tr><td colspan="5" class="empty-state">Chargement…</td></tr>
-                            </tbody>
+                            <tbody id="filiereStudentsTableBody"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">Modules de cette filière</div>
+                        <table class="data-table" id="filiereModulesTable">
+                            <thead>
+                                <tr>
+                                    <th>Module</th>
+                                    <th>Professeur</th>
+                                    <th>Moyenne de classe</th>
+                                </tr>
+                            </thead>
+                            <tbody id="filiereModulesTableBody"></tbody>
                         </table>
                     </div>
                 </section>
 
-                <section class="app-section" id="professors">
+                <!-- ===== ML DASHBOARD ===== -->
+                <section class="app-section" id="ml-dashboard">
                     <div class="section-heading">
                         <div>
-                            <h1>Professeurs</h1>
-                            <p>Liste des professeurs et leurs modules assignés</p>
+                            <h1>Dashboard IA / Machine Learning</h1>
+                            <p>Maquette — à connecter au modèle plus tard</p>
+                        </div>
+                        <select id="mlFiliereSelect" style="min-width:220px;"></select>
+                    </div>
+
+                    <div class="ml-grid">
+                        <div class="card">
+                            <div class="card-title">Répartition des moyennes</div>
+                            <div class="ml-chart-placeholder" id="mlChartPlaceholder">
+                                <div class="ml-chart-bar" style="height:30%"></div>
+                                <div class="ml-chart-bar" style="height:55%"></div>
+                                <div class="ml-chart-bar" style="height:80%"></div>
+                                <div class="ml-chart-bar" style="height:65%"></div>
+                                <div class="ml-chart-bar" style="height:40%"></div>
+                                <div class="ml-chart-bar" style="height:20%"></div>
+                            </div>
+                            <div class="ml-chart-labels">
+                                <span>0-5</span><span>5-8</span><span>8-10</span>
+                                <span>10-13</span><span>13-16</span><span>16-20</span>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-title">État des modèles</div>
+                            <div class="model-status-card">
+                                <span class="model-status-dot off"></span>
+                                <div>
+                                    <strong>Prédiction de réussite</strong>
+                                    <div style="font-size:12px;color:var(--color-text-muted);">Règle simple ou scikit-learn — non branché</div>
+                                </div>
+                            </div>
+                            <div class="model-status-card">
+                                <span class="model-status-dot off"></span>
+                                <div>
+                                    <strong>Détection étudiants à risque</strong>
+                                    <div style="font-size:12px;color:var(--color-text-muted);">Basé sur assiduité + moyenne — non branché</div>
+                                </div>
+                            </div>
+                            <div class="model-status-card">
+                                <span class="model-status-dot off"></span>
+                                <div>
+                                    <strong>Assistant IA (FastAPI/LLM)</strong>
+                                    <div style="font-size:12px;color:var(--color-text-muted);">UI prête côté étudiant — non branché</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="card">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Nom</th>
-                                    <th>Email</th>
-                                    <th>Modules assignés</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="professorTableBody">
-                                <tr><td colspan="4" class="empty-state">Chargement…</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <section class="app-section" id="students">
-                    <div class="section-heading">
-                        <div>
-                            <h1>Étudiants</h1>
-                            <p>Liste des étudiants par filière</p>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Nom</th>
-                                    <th>Email</th>
-                                    <th>Filière</th>
-                                    <th>Statut</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="studentTableBody">
-                                <tr><td colspan="5" class="empty-state">Chargement…</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <section class="app-section" id="ai-insights">
-                    <div class="section-heading">
-                        <div>
-                            <h1>AI &amp; ML Insights</h1>
-                            <p>Fonctionnalités intelligentes à activer au fur et à mesure - rien n'est branché pour l'instant, l'UI est prête</p>
+                        <div class="card-title">Étudiants à risque (maquette)</div>
+                        <div id="riskStudentsList">
+                            <div class="risk-row">
+                                <span>— Aucune donnée tant que le modèle n'est pas branché —</span>
+                            </div>
                         </div>
                     </div>
 
@@ -186,51 +187,24 @@
                             Roadmap suggérée
                         </div>
                         <p style="margin:0 0 16px;color:var(--color-text-muted);font-size:13.5px;">
-                            Basé sur la spec du projet - activez ces cartes une par une une fois le MVP stable, dans cet ordre.
+                            Dans cet ordre, une fois le MVP stable.
                         </p>
-
                         <div class="ai-feature-list">
                             <div class="ai-feature-card">
-                                <div class="ai-feature-head">
-                                    <h4>Prédiction de réussite</h4>
-                                    <label class="toggle"><input type="checkbox" disabled><span class="toggle-slider"></span></label>
-                                </div>
-                                <p>Règle simple d'abord (assiduité &lt; 50% ou moyenne &lt; 10 → à risque), modèle scikit-learn ensuite.</p>
+                                <div class="ai-feature-head"><h4>1. Règle simple à risque</h4><span class="badge badge-ai">facile</span></div>
+                                <p>Si assiduité &lt; 50% ou moyenne &lt; 10 → marquer à risque. Zéro modèle nécessaire.</p>
                             </div>
                             <div class="ai-feature-card">
-                                <div class="ai-feature-head">
-                                    <h4>Génération de plan de cours</h4>
-                                    <label class="toggle"><input type="checkbox" disabled><span class="toggle-slider"></span></label>
-                                </div>
-                                <p>Le professeur décrit un module, un LLM génère un plan semaine par semaine.</p>
+                                <div class="ai-feature-head"><h4>2. Modèle scikit-learn</h4><span class="badge badge-ai">moyen</span></div>
+                                <p>Remplacer la règle par un modèle entraîné (joblib), servi par FastAPI.</p>
                             </div>
                             <div class="ai-feature-card">
-                                <div class="ai-feature-head">
-                                    <h4>Génération de quiz</h4>
-                                    <label class="toggle"><input type="checkbox" disabled><span class="toggle-slider"></span></label>
-                                </div>
-                                <p>QCM / Vrai-Faux / question de code générés automatiquement par module.</p>
+                                <div class="ai-feature-head"><h4>3. Assistant IA étudiant</h4><span class="badge badge-ai">moyen</span></div>
+                                <p>Brancher Conversation/Message à un LLM via FastAPI.</p>
                             </div>
                             <div class="ai-feature-card">
-                                <div class="ai-feature-head">
-                                    <h4>Assistant IA étudiant</h4>
-                                    <label class="toggle"><input type="checkbox" checked disabled><span class="toggle-slider"></span></label>
-                                </div>
-                                <p>UI déjà en place côté étudiant (onglet Assistant IA) - reste à brancher le backend/LLM.</p>
-                            </div>
-                            <div class="ai-feature-card">
-                                <div class="ai-feature-head">
-                                    <h4>Résumé de cours (PDF)</h4>
-                                    <label class="toggle"><input type="checkbox" disabled><span class="toggle-slider"></span></label>
-                                </div>
-                                <p>Le professeur upload un PDF, un résumé est généré et stocké par module.</p>
-                            </div>
-                            <div class="ai-feature-card">
-                                <div class="ai-feature-head">
-                                    <h4>Alertes automatiques</h4>
-                                    <label class="toggle"><input type="checkbox" disabled><span class="toggle-slider"></span></label>
-                                </div>
-                                <p>Notifier le professeur/directeur si assiduité &lt; 50% ou moyenne &lt; 10.</p>
+                                <div class="ai-feature-head"><h4>4. Génération de cours/quiz</h4><span class="badge badge-ai">avancé</span></div>
+                                <p>Outils IA côté professeur — dernière étape de la roadmap.</p>
                             </div>
                         </div>
                     </div>

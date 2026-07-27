@@ -1,5 +1,6 @@
 package com.codewithkahlil.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,8 +32,14 @@ import java.util.List;
 @DiscriminatorValue("STUDENT")
 public class Student extends Personne {
 
+    private String cni ;
+
+    private String cne ;
+
+
     @ManyToOne
     @JoinColumn(name = "filiere_id")
+    @JsonIgnore
     private Filiere filiere;
 
     @Builder.Default

@@ -1,5 +1,6 @@
 package com.codewithkahlil.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,10 +30,14 @@ public class Filiere {
 
     @Builder.Default
     @OneToMany(mappedBy = "filiere")
+    @JsonManagedReference
     private List<Student> students = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "filiere", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Module> modules = new ArrayList<>();
 
 }
+
+

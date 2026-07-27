@@ -659,3 +659,134 @@ input:focus, textarea:focus, select:focus {
   .chat-shell { grid-template-columns: 1fr; }
   .schedule-grid { grid-template-columns: 60px repeat(6, 1fr); font-size: 11px; }
 }
+
+/* ============================================
+   Added for: module cards, notes tables,
+   ML dashboard mockup - director/professor/student
+   ============================================ */
+
+.module-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  margin-bottom: 14px;
+}
+
+.module-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.module-card-head h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.module-card-desc {
+  margin: 10px 0 0;
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.notes-grid .form-field label {
+  font-size: 12px;
+}
+
+.filiere-picker {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.filiere-picker .form-field {
+  min-width: 200px;
+}
+
+/* ---------- ML dashboard mockup ---------- */
+
+.ml-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 18px;
+}
+
+.ml-chart-placeholder {
+  height: 200px;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 10px 4px 0;
+}
+
+.ml-chart-bar {
+  flex: 1;
+  background: linear-gradient(180deg, var(--color-ai) 0%, var(--color-primary) 100%);
+  border-radius: 6px 6px 0 0;
+  opacity: 0.85;
+}
+
+.ml-chart-labels {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.ml-chart-labels span {
+  flex: 1;
+  text-align: center;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.risk-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 13.5px;
+}
+
+.risk-row:last-child { border-bottom: none; }
+
+.risk-score {
+  font-weight: 700;
+}
+
+.model-status-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 10px;
+}
+
+.model-status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.model-status-dot.off { background: var(--color-text-muted); }
+.model-status-dot.on { background: var(--color-success); }
+
+@media (max-width: 1000px) {
+  .notes-grid { grid-template-columns: 1fr 1fr; }
+  .ml-grid { grid-template-columns: 1fr; }
+}

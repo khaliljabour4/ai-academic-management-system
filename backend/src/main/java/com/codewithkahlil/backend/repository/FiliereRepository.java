@@ -10,4 +10,5 @@ import org.springframework.stereotype.Repository;
 public interface FiliereRepository extends JpaRepository<Filiere , Integer> {
 
     Filiere findByName(String name) ;
+    Filiere findById(int id);
 }

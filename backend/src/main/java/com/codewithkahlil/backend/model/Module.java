@@ -1,5 +1,6 @@
 package com.codewithkahlil.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.DayOfWeek;
@@ -7,11 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.*;
 
-/**
- * A course/subject taught to one Filiere by one Professor.
- * "hasTp" flags whether this module carries a practical-work grade -
- * if false, the TP note on each Grade for this module should stay null.
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,6 +22,7 @@ public class Module {
 
     private String name;
 
+    private String description ;
 
     @ManyToOne
     @JoinColumn(name = "teacher_id")
@@ -33,6 +30,7 @@ public class Module {
 
     @ManyToOne
     @JoinColumn(name = "filiere_id")
+    @JsonIgnore
     private Filiere filiere;
 
     @Builder.Default
@@ -41,6 +39,7 @@ public class Module {
 
     @Enumerated(EnumType.STRING)
     private DayOfWeek dayOfWeek;
+
 
     @Enumerated(EnumType.STRING)
     private TimeSlot timeSlot;

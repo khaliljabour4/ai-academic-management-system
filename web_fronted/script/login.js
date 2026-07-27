@@ -15,7 +15,7 @@ async function login(){
         });
 
         if(!response.ok){
-            console.log("access denied");
+            alert("access denied");
             return ; 
         }else{
             console.log("access giving");
@@ -37,5 +37,6 @@ async function login(){
     }
     catch(error){
         console.error(error);
+        alert("error");
     }
     }
