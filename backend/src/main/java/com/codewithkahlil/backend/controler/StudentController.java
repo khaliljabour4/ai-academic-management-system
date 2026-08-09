@@ -25,6 +25,10 @@ public class StudentController {
     private final ModuleRepository moduleRepository;
     private final GradeRepository gradeRepository;
     private final ConversationRepository conversationRepository;
+    private final org.springframework.web.client.RestTemplate restTemplate;
+
+    @org.springframework.beans.factory.annotation.Value("${ai.service.url}")
+    private String aiServiceUrl;
 
     private Student currentStudent() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -158,7 +162,7 @@ public class StudentController {
                         .build();
             }
 
-            String response = generateAiResponse(request.getQuestion());
+            String response = generateAiResponse(request.getQuestion(), conversation.getMessages());
 
             conversation.addMessage(request.getQuestion(), response);
             conversationRepository.save(conversation);
@@ -180,7 +184,23 @@ public class StudentController {
      * TODO: call FastAPI/LLM here and return its real answer.
      * Left empty on purpose - not implemented yet.
      */
-    private String generateAiResponse(String question) {
-        return "";
+    private String generateAiResponse(String question, List<String> history) {
+        try {
+            java.util.Map<String, Object> body = new java.util.HashMap<>();
+            body.put("question", question);
+            body.put("history", history);
+
+            org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+            headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
+
+            org.springframework.http.HttpEntity<java.util.Map<String, Object>> entity =
+                    new org.springframework.http.HttpEntity<>(body, headers);
+
+            java.util.Map<String, Object> result = restTemplate.postForObject(aiServiceUrl, entity, java.util.Map.class);
+            return result != null ? String.valueOf(result.get("answer")) : "Pas de réponse disponible pour le moment";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Assistant IA indisponible pour le moment";
+        }
     }
 }

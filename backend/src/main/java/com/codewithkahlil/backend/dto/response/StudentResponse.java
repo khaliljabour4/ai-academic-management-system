@@ -10,4 +10,8 @@ public class StudentResponse {
     String name ;
     String prenom ;
     String email ;
+    String cni ;
+    String cne ;
+    int filiereId ;
+    String filiereName ;
 }

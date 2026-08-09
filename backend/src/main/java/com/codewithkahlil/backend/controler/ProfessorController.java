@@ -25,8 +25,8 @@ public class ProfessorController {
     private final StudentRepository studentRepository;
     private final ModuleRepository moduleRepository;
     private final GradeRepository gradeRepository;
+    private final FiliereRepository filiereRepository;
 
-    /** Every controller here needs "which Professor is currently logged in" - same lookup, so one helper. */
     private Professor currentProfessor() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return professorRepository.findByUser_Email(user.getEmail());
@@ -45,6 +45,7 @@ public class ProfessorController {
                             .description(m.getDescription())
                             .profName(professor.getPrenom())
                             .filiereName(m.getFiliere().getName())
+                            .filiereId(m.getFiliere().getId())
                             .build()
             ).toList();
 
@@ -55,28 +56,26 @@ public class ProfessorController {
         }
     }
 
-    /**
-     * The students the professor needs to fill grades for: every student
-     * in this module's filiere, each with their current note1/2/3 for this
-     * module if a Grade row already exists (so the professor can edit,
-     * not just create).
-     */
+
     @GetMapping("/students/{moduleId}")
     ResponseEntity<?> getStudentsForModule(@PathVariable int moduleId) {
         try {
             Module module = moduleRepository.findById(moduleId);
-            List<Student> students = studentRepository.findByFiliere_Id(module.getFiliere().getId());
-
+            List<Student> students = module.getFiliere().getStudents();
             List<StudentGradeRowResponse> rows = students.stream().map(s -> {
-                Grade existing = gradeRepository.findByStudent_IdAndModule_Id(s.getId(), moduleId);
+                Grade grade = gradeRepository.findByStudent_IdAndModule_Id(s.getId(), moduleId);
                 return StudentGradeRowResponse.builder()
                         .studentId(s.getId())
                         .name(s.getName())
                         .prenom(s.getPrenom())
-                        .note1(existing != null ? existing.getNote1() : null)
-                        .note2(existing != null ? existing.getNote2() : null)
-                        .note3(existing != null ? existing.getNote3() : null)
-                        .noteTp(existing != null ? existing.getNoteTp() : null)
+                        .note1(grade != null? grade.getNote1() : null)
+                        .note2(grade != null? grade.getNote2() : null)
+                        .note3(grade != null? grade.getNote3() : null)
+                        .moyen(grade!=null &&
+                                grade.getNote1()!=null &&
+                                grade.getNote2() != null &&
+                                grade.getNote3() != null?
+                                grade.getNoteGenerale() : null)
                         .build();
             }).toList();
 
@@ -87,12 +86,7 @@ public class ProfessorController {
         }
     }
 
-    /**
-     * Submits ONE column (note1, note2, or note3) for every student in the
-     * list at once. If any entry in the column is missing/blank, the whole
-     * column is rejected - nothing is saved. Only once every row in that
-     * column is filled can it be submitted.
-     */
+
     @PostMapping("/grades")
     ResponseEntity<?> submitGradeColumn(@RequestBody GradeColumnRequest request) {
 

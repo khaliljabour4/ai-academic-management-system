@@ -12,5 +12,5 @@ public class StudentGradeRowResponse {
     Double note1;
     Double note2;
     Double note3;
-    Double noteTp;
+    Double moyen ;
 }

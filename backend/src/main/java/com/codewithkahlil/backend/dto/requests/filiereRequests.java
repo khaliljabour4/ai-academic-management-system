@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class filiereRequests {
-    String name ;
+    String name ; 
     String description ;
 }

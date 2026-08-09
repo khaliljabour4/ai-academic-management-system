@@ -5,9 +5,9 @@ permitAccess("Administrator");
 const data = await getAllFilliere();
 fillTableFiliere(data);
 
-fillOptionFiliereForProf();
 fillOptionFiliereStudent();
-fillOptionModule();
+await fillOptionModule();
+await fillModuleSlotSelection();
 
  getAllStudent();
 getAllModule();
@@ -168,26 +168,13 @@ async function deleteFiliere(id) {
 }
 
 
-function fillOptionFiliereForProf(){
-    const selectionFiliereProf = document.getElementById("profFiliere");
-    let selectionHtml = ``;
-    for (let i = 0 ; i < data.length ; i++){
-        selectionHtml += `<option value=${data[i].id}>${data[i].name}</option>`;
-    }
-    selectionFiliereProf.innerHTML = selectionHtml;
-
-
-}
-
-
 /* ---------- Prof---------- */
 
 
 async function creerProf(){
     const  name = document.getElementById("profLastName").value ; 
     const prenom = document.getElementById("profFirstName").value; 
-    const filiereid = document.getElementById("profFiliere").value;
-        const password = document.getElementById("profPassword").value ; 
+    const password = document.getElementById("profPassword").value ; 
 
     const response = await fetch("http://localhost:8080/api/v1/admin/prof" , 
         {
@@ -198,8 +185,7 @@ async function creerProf(){
             },
             body :JSON.stringify({
                 name : name ,
-                prenom : prenom , 
-                filiereid : filiereid , 
+                prenom : prenom ,  
                 password :password 
             })
         });
@@ -253,7 +239,7 @@ function fillTableProfs(data) {
         tableHtml += `<tr>
                         <td>${data[i].name}</td>
                         <td>${data[i].prenom}</td>
-                        <td>${data[i].user?.email ?? "—"}</td>
+                        <td>${data[i].user.email}</td>
                         <td>
                             <button class="icon-btn delete-prof-btn" value="${data[i].id}" title="Supprimer">✕</button>
                         </td>
@@ -261,6 +247,29 @@ function fillTableProfs(data) {
     }
 
     document.getElementById("profTableRows").innerHTML = tableHtml;
+}
+
+const profRow = document.getElementById("profTableRows");
+profRow.addEventListener("click", (event) => {
+    const button = event.target.closest(".delete-prof-btn");
+    if (!button) return;
+    deleteProf(button.value);
+});
+async function deleteProf(profId){
+    const response = await fetch (`http://localhost:8080/api/v1/admin/profs/delete/${profId}` , {
+        method: "DELETE" , 
+        headers:{
+            "Authorization" : localStorage.getItem("jwt")
+        }
+    })
+
+    if(!response.ok){
+        window.alert("prof was not deleted") ; 
+        return ;
+    }
+
+    await getAllProfs();
+
 }
 
 
@@ -280,13 +289,15 @@ function fillOptionFiliereStudent(){
     etudiantSelectionFiliere.innerHTML = optionHtml ; 
 }
 
+let editingStudentId = null;
+
 async function createStudent(){
 
     const  lastName = document.getElementById("studentLastName");
     const  firstName = document.getElementById("studentFirstName");
     const  cni = document.getElementById("studentCNI");
     const  cne = document.getElementById("studentCNE");
-    const filiereId = document.getElementById("studentFiliere");
+    const filiereId = document.getElementById("studentFiliere").value;
 
     const response = await fetch("http://localhost:8080/api/v1/admin/student", {
     method: "POST",
@@ -299,9 +310,10 @@ async function createStudent(){
         prenom: firstName.value,
         cni: cni.value,
         cne: cne.value,
-        filiereId: filiereId.value
+        filiereId: filiereId
         })
     });
+
  if (response.status === 401 || response.status === 403) {
         window.alert("ur not allowed");
         return;
@@ -311,7 +323,61 @@ async function createStudent(){
         return;
     }
     window.alert("Student created successfully");
+    clearStudentForm();
+}
 
+async function updateStudent(id){
+
+    const  lastName = document.getElementById("studentLastName");
+    const  firstName = document.getElementById("studentFirstName");
+    const  cni = document.getElementById("studentCNI");
+    const  cne = document.getElementById("studentCNE");
+    const filiereID = document.getElementById("studentFiliere").value;
+
+    const response = await fetch(`http://localhost:8080/api/v1/admin/students/${id}`, {
+    method: "PUT",
+    headers: {
+        "Authorization": localStorage.getItem('jwt'),
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+        name: lastName.value,
+        prenom: firstName.value,
+        cni: cni.value,
+        cne: cne.value,
+        filiereId: filiereID
+        })
+    });
+
+    if (response.status === 401 || response.status === 403) {
+        window.alert("ur not allowed");
+        return;
+    }
+    if (!response.ok) {
+        window.alert("Student wasn't updated");
+        return;
+    }
+    window.alert("Student updated successfully");
+    clearStudentForm();
+}
+
+function startEditStudent(student){
+    editingStudentId = student.id;
+    document.getElementById("studentLastName").value = student.name;
+    document.getElementById("studentFirstName").value = student.prenom;
+    document.getElementById("studentCNI").value = student.cni ?? "";
+    document.getElementById("studentCNE").value = student.cne ?? "";
+    document.getElementById("studentFiliere").value = student.filiereId;
+    saveStudentBtn.textContent = "Modifier";
+}
+
+function clearStudentForm(){
+    editingStudentId = null;
+    document.getElementById("studentLastName").value = "";
+    document.getElementById("studentFirstName").value = "";
+    document.getElementById("studentCNI").value = "";
+    document.getElementById("studentCNE").value = "";
+    saveStudentBtn.textContent = "Enregistrer";
 }
 
 async function getAllStudent() {
@@ -335,7 +401,10 @@ async function getAllStudent() {
     fillTableStudent(student);
 }
 
+let lastLoadedStudents = [];
+
 function fillTableStudent(data) {
+    lastLoadedStudents = data;
 
     let tableHtml = `<tr>
                         <th>Nom</th>
@@ -350,7 +419,8 @@ function fillTableStudent(data) {
                         <td>${data[i].prenom}</td>
                         <td>${data[i].email ?? "—"}</td>
                         <td>
-                            <button class="icon-btn delete-prof-btn" value="${data[i].id}" title="Supprimer">✕</button>
+                            <button class="icon-btn edit-student-btn" value="${data[i].id}" title="Modifier">✎</button>
+                            <button class="icon-btn delete-student-btn" value="${data[i].id}" title="Supprimer">✕</button>
                         </td>
                     </tr>`;
     }
@@ -360,10 +430,43 @@ function fillTableStudent(data) {
 
 const saveStudentBtn = document.getElementById("createStudentBtn") ;
 saveStudentBtn.addEventListener("click" , async ()=>{
-    await createStudent() ;
-     getAllStudent();
+    if(editingStudentId != null){
+        await updateStudent(editingStudentId);
+    }else{
+        await createStudent() ;
+    }
+    getAllStudent();
 })
 
+const studentRow = document.getElementById("studentTableRows");
+studentRow.addEventListener("click", (event) => {
+    const deleteButton = event.target.closest(".delete-student-btn");
+    if (deleteButton) {
+        deleteStudent(deleteButton.value);
+        return;
+    }
+    const editButton = event.target.closest(".edit-student-btn");
+    if (editButton) {
+        const student = lastLoadedStudents.find(s => s.id == editButton.value);
+        if (student) startEditStudent(student);
+    }
+});
+async function deleteStudent(studentId){
+    const response = await fetch (`http://localhost:8080/api/v1/admin/students/delete?id=${studentId}` , {
+        method: "DELETE" , 
+        headers:{
+            "Authorization" : localStorage.getItem("jwt")
+        }
+    })
+
+    if(!response.ok){
+        window.alert("prof was not deleted") ; 
+        return ;
+    }
+
+    await getAllStudent();
+
+}
 /* ---------- Module---------- */
 
 async function fillOptionModule(){
@@ -390,13 +493,49 @@ async function fillOptionModule(){
     selectionProfModule.innerHTML = optionProfHtml ; 
 }
 
+const moduleSlotSelect = document.getElementById("moduleSlot");
+
+async function fillModuleSlotSelection(){
+    const filiereId = document.getElementById("moduleFiliere").value;
+    if(!filiereId){
+        moduleSlotSelect.innerHTML = `<option value="">Choisis une filière d'abord</option>`;
+        return;
+    }
+
+    const response = await fetch(`http://localhost:8080/api/v1/admin/available-slots/${filiereId}`, {
+        headers: {
+            "Authorization": localStorage.getItem("jwt")
+        }
+    });
+
+    if(!response.ok){
+        moduleSlotSelect.innerHTML = `<option value="">Aucun créneau disponible</option>`;
+        return;
+    }
+
+    const slots = await response.json();
+    let slotOptionsHtml = ``;
+    for(let i = 0; i < slots.length; i++){
+        slotOptionsHtml += `<option value="${slots[i].dayOfWeek}|${slots[i].timeSlot}">${slots[i].dayOfWeek} - ${slots[i].timeSlot}</option>`;
+    }
+    moduleSlotSelect.innerHTML = slotOptionsHtml || `<option value="">Aucun créneau disponible</option>`;
+}
+
+document.getElementById("moduleFiliere").addEventListener("change", fillModuleSlotSelection);
+
 async function createModule (){
     const moduleName = document.getElementById("moduleName").value;
     const moduleDesc = document.getElementById("moduleDesc").value ;
     const profId = parseInt(document.getElementById("moduleProfessor").value);
     const filiereId = parseInt(document.getElementById("moduleFiliere").value); 
-    const filiereDay = document.getElementById("dayOfWeek").value.toUpperCase();
-    const timeSlot = document.getElementById("timeSlot").value.toUpperCase(); 
+    const slotValue = moduleSlotSelect.value;
+
+    if(!slotValue){
+        window.alert("Aucun créneau libre sélectionné");
+        return;
+    }
+
+    const [filiereDay, timeSlot] = slotValue.split("|");
 
     const response = await fetch("http://localhost:8080/api/v1/admin/module", {
     method: "POST",
@@ -419,11 +558,11 @@ async function createModule (){
         return;
     }
     if (!response.ok) {
-        window.alert("Student wasn't created");
+        window.alert("Module wasn't created");
         return;
     }
-    window.alert("Student created successfully");
-
+    window.alert("Module created successfully");
+    await fillModuleSlotSelection();
 }
 
 async function getAllModule() {
@@ -464,12 +603,35 @@ function fillTableModule(modules) {
                         <td>${modules[i].filiereName}</td>
                         <td>${modules[i].profName}</td>
                         <td>
-                            <button class="icon-btn delete-prof-btn" value="${modules[i].id}" title="Supprimer">✕</button>
+                            <button class="icon-btn delete-module-btn" value="${modules[i].id}" title="Supprimer">✕</button>
                         </td>
                     </tr>`;
     }
 
     document.getElementById("moduleTableRows").innerHTML = tableHtml;
+}
+
+document.getElementById("moduleTableRows").addEventListener("click", (event) => {
+    const button = event.target.closest(".delete-module-btn");
+    if (!button) return;
+    deleteModule(button.value);
+});
+
+async function deleteModule(id){
+    const response = await fetch(`http://localhost:8080/api/v1/admin/module/delete/${id}`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": localStorage.getItem("jwt")
+        }
+    });
+
+    if(!response.ok){
+        window.alert("module was not deleted");
+        return;
+    }
+
+    await getAllModule();
+    await fillModuleSlotSelection();
 }
 
 document.getElementById("createModuleBtn").addEventListener("click" , async () =>{

@@ -9,5 +9,5 @@ public class studentRequest {
      String prenom ;
      String cni ;
      String cne ;
-     int filiereID ;
+     int filiereId ;
 }

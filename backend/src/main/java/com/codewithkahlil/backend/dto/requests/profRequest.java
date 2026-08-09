@@ -9,7 +9,5 @@ public class profRequest {
 
     private String prenom;
 
-    private int filiereid ;
-
     private String password ;
 }

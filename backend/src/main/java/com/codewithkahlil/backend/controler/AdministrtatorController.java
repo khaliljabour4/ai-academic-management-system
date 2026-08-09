@@ -97,7 +97,6 @@ public class AdministrtatorController {
         String prenom = request.getPrenom().toLowerCase() ;
         String email = name+prenom+"@test.com";
         String password = request.getPassword();
-        int filiereid = request.getFiliereid();
 
         RegistreRequest registre= RegistreRequest.builder()
                 .email(email)
@@ -145,6 +144,36 @@ public class AdministrtatorController {
         }
     }
 
+    @DeleteMapping("/profs/delete/{id}")
+    ResponseEntity<?> deleteProf(@PathVariable int id){
+        try {
+            professorRepository.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/profs/{id}")
+    ResponseEntity<?> updateProf(@PathVariable int id, @RequestBody profRequest request){
+        try {
+            Professor professor = professorRepository.findById(id);
+            if(professor == null){
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            professor.setName(request.getName().toLowerCase());
+            professor.setPrenom(request.getPrenom().toLowerCase());
+            professorRepository.save(professor);
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     //student
     @PostMapping("/student")
     ResponseEntity<?> crateStiudent(@RequestBody studentRequest request){
@@ -164,7 +193,7 @@ public class AdministrtatorController {
          }
          try{
              User user = userRepository.findUserByEmail(email) ;
-             Filiere filiere = filiereRepository.findById(request.getFiliereID());
+             Filiere filiere = filiereRepository.findById(request.getFiliereId());
              Student student = Student.builder()
                      .cni(request.getCni())
                      .cne(request.getCne())
@@ -194,6 +223,10 @@ public class AdministrtatorController {
                                         .prenom(m.getPrenom())
                                         .email(m.getUser().getEmail())
                                         .id(m.getId())
+                                        .cni(m.getCni())
+                                        .cne(m.getCne())
+                                        .filiereId(m.getFiliere() != null ? m.getFiliere().getId() : 0)
+                                        .filiereName(m.getFiliere() != null ? m.getFiliere().getName() : "")
                                         .build();
                             }
                     ).toList();
@@ -204,6 +237,40 @@ public class AdministrtatorController {
         }
     }
 
+    @DeleteMapping("/students/delete")
+    ResponseEntity<?> deleteStudent(@RequestParam int id){
+        try {
+            studentRepository.deleteById(id);
+        }catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK );
+    }
+
+    @PutMapping("/students/{id}")
+    ResponseEntity<?> updateStudent(@PathVariable int id, @RequestBody studentRequest request){
+        try{
+            Student student = studentRepository.findById(id);
+            if(student == null){
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            student.setName(request.getName());
+            student.setPrenom(request.getPrenom());
+            student.setCni(request.getCni());
+            student.setCne(request.getCne());
+
+            Filiere filiere = filiereRepository.findById(request.getFiliereId());
+            student.setFiliere(filiere);
+
+            studentRepository.save(student);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }catch(Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     //module
     @PostMapping("/module")
@@ -235,6 +302,17 @@ public class AdministrtatorController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+
+    @DeleteMapping("/module/delete/{id}")
+    ResponseEntity<?> deleteModule(@PathVariable int id){
+        try {
+            moduleRepository.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @GetMapping("/modules")
     ResponseEntity<?> listAllModules(){

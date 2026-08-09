@@ -35,22 +35,20 @@ public class Grade {
 
     private Double note3;
 
-    // Only set when module.isHasTp() is true - leave null otherwise
-    private Double noteTp;
 
     private Double noteGenerale;
 
-    private String semester;
-
-    public void computeNoteGenerale() {
+    public Double computeNoteGenerale() {
         double sum = 0;
         int count = 0;
-        for (Double n : new Double[]{note1, note2, note3, noteTp}) {
+        for (Double n : new Double[]{note1, note2, note3}) {
             if (n != null) {
                 sum += n;
                 count++;
             }
         }
-        this.noteGenerale = count == 0 ? null : sum / count;
+        if (count == 3) this.noteGenerale =sum / count  ;
+        return this.noteGenerale ;
     }
+
 }

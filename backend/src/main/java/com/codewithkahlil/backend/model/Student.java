@@ -39,7 +39,6 @@ public class Student extends Personne {
 
     @ManyToOne
     @JoinColumn(name = "filiere_id")
-    @JsonIgnore
     private Filiere filiere;
 
     @Builder.Default

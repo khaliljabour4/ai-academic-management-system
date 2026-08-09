@@ -10,5 +10,6 @@ public class ModuleResponse {
     String name ;
     String description ;
     String filiereName ;
+    int filiereId ;
     String profName ;
 }
