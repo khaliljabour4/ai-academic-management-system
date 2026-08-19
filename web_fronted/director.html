@@ -28,6 +28,10 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.9 4.9l2.8 2.8"/><path d="M16.3 16.3l2.8 2.8"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.9 19.1l2.8-2.8"/><path d="M16.3 7.7l2.8-2.8"/><circle cx="12" cy="12" r="3.2"/></svg>
                     Dashboard IA/ML
                 </button>
+                <button class="app-nav-btn" data-target="predictions">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg>
+                    Prédictions précoces
+                </button>
             </nav>
 
             <div class="app-sidebar-footer">
@@ -44,7 +48,7 @@
                     <div class="app-header-title" id="pageTitle">Overview</div>
                 </div>
                 <div class="app-header-right">
-                    <div class="app-avatar">D</div>
+                    <a href="profile.html" class="app-avatar" style="text-decoration:none;" title="Mon profil">D</a>
                 </div>
             </header>
 
@@ -76,6 +80,23 @@
                             <div class="stat-label">Moyenne générale</div>
                             <div class="stat-value" id="statAverage">–</div>
                         </div>
+                    </div>
+
+                    <div class="card" style="margin-top:20px;">
+                        <div class="card-title">Toutes les filières en un coup d'œil</div>
+                        <table class="data-table" id="filieresOverviewTable">
+                            <thead>
+                                <tr>
+                                    <th>Filière</th>
+                                    <th>Étudiants</th>
+                                    <th>Professeurs</th>
+                                    <th>Moyenne</th>
+                                    <th>Étudiants notés</th>
+                                    <th>À risque</th>
+                                </tr>
+                            </thead>
+                            <tbody id="filieresOverviewTableBody"></tbody>
+                        </table>
                     </div>
                 </section>
 
@@ -207,6 +228,44 @@
                                 <p>Outils IA côté professeur — dernière étape de la roadmap.</p>
                             </div>
                         </div>
+                    </div>
+                </section>
+
+                <!-- ===== EARLY PREDICTIONS ===== -->
+                <section class="app-section" id="predictions">
+                    <div class="section-heading">
+                        <div>
+                            <h1>Prédictions précoces</h1>
+                            <p>Dès qu'un prof entre la première note, estime la réussite sans attendre les 3 notes</p>
+                        </div>
+                        <select id="predictionsFiliereSelect" style="min-width:220px;"></select>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">Choisir un module</div>
+                        <select id="predictionsModuleSelect" style="min-width:280px;"></select>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">Estimation par étudiant</div>
+                        <table class="data-table" id="predictionsTable">
+                            <thead>
+                                <tr>
+                                    <th>Étudiant</th>
+                                    <th>Note 1</th>
+                                    <th>Note 2</th>
+                                    <th>Note 3</th>
+                                    <th>Notes utilisées</th>
+                                    <th>Fiabilité</th>
+                                    <th>Réussite estimée</th>
+                                </tr>
+                            </thead>
+                            <tbody id="predictionsTableBody"></tbody>
+                        </table>
+                        <p style="font-size:12px;color:var(--color-text-muted);margin-top:10px;">
+                            L'estimation s'affine au fur et à mesure que le professeur ajoute les notes 2 et 3.
+                            Avec une seule note, la fiabilité est faible.
+                        </p>
                     </div>
                 </section>
 

@@ -1,143 +1,73 @@
 package com.codewithkahlil.backend.controler;
 
-
-import com.codewithkahlil.backend.auth.AuthenticationService;
-import com.codewithkahlil.backend.auth.RegistreRequest;
 import com.codewithkahlil.backend.dto.requests.filiereRequests;
 import com.codewithkahlil.backend.dto.requests.moduleRequest;
 import com.codewithkahlil.backend.dto.requests.profRequest;
 import com.codewithkahlil.backend.dto.requests.studentRequest;
-import com.codewithkahlil.backend.dto.response.*;
-import com.codewithkahlil.backend.dto.response.StudentResponse;
-import com.codewithkahlil.backend.model.*;
-import com.codewithkahlil.backend.model.Module;
-import com.codewithkahlil.backend.repository.*;
-import jakarta.validation.constraints.Null;
+import com.codewithkahlil.backend.exception.ConflictException;
+import com.codewithkahlil.backend.exception.NotFoundException;
+import com.codewithkahlil.backend.service.AdminService;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.connector.Response;
-import org.hibernate.dialect.SybaseASEDialect;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
-import org.springframework.data.web.ReactiveOffsetScrollPositionHandlerMethodArgumentResolver;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.w3c.dom.stylesheets.LinkStyle;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static java.util.stream.Collectors.toList;
 
 @RestController
 @RequestMapping("api/v1/admin")
 @RequiredArgsConstructor
 public class AdministrtatorController {
 
-    private final FiliereRepository filiereRepository ;
-    private final AuthenticationService authenticationService ;
-    private final UserRepository userRepository ;
-    private final  ProfessorRepository professorRepository ;
-    private final StudentRepository studentRepository ;
-    private final ModuleRepository moduleRepository ;
+    private final AdminService adminService;
 
     @PostMapping("/filiere")
-    ResponseEntity<?> creerFiliere (@RequestBody filiereRequests filiereRequest){
-        Filiere filiereExisted = filiereRepository.findByName(filiereRequest.getName().toLowerCase());
-
-        if(filiereExisted != null){
-            return new ResponseEntity<>("filiere existe deja",HttpStatus.CONFLICT);
-        }
-        try{
-            Filiere filiere = Filiere.builder()
-                    .name(filiereRequest.getName().toLowerCase())
-                    .description(filiereRequest.getDescription())
-                    .build();
-
-            Filiere saved =filiereRepository.save(filiere);
-
-            return new ResponseEntity<>( saved ,HttpStatus.CREATED);
-        }catch(Exception e){
-            return new ResponseEntity<>("filiere not saved ", HttpStatus.INTERNAL_SERVER_ERROR);
+    ResponseEntity<?> creerFiliere(@RequestBody filiereRequests request) {
+        try {
+            return new ResponseEntity<>(adminService.creerFiliere(request), HttpStatus.CREATED);
+        } catch (ConflictException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/filiere")
-    ResponseEntity<?> getAllFiliere (){
-        List<FiliereResponse> filieres  = new ArrayList<>();
-        try{
-            filieres = filiereRepository.findAll().stream()
-                    .map(f -> FiliereResponse.builder()
-                                    .id(f.getId())
-                                    .name(f.getName())
-                                    .description(f.getDescription())
-                                    .build()
-                    ).toList();
-            return new ResponseEntity<>(filieres , HttpStatus.OK);
-        }catch(Exception e){
+    ResponseEntity<?> getAllFiliere() {
+        try {
+            return new ResponseEntity<>(adminService.getAllFiliere(), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping("filiere")
-    ResponseEntity<?> deleteFiliereByID(@RequestParam int id){
-        try{
-            filiereRepository.deleteById(id);
+    ResponseEntity<?> deleteFiliereByID(@RequestParam int id) {
+        try {
+            adminService.deleteFiliere(id);
             return new ResponseEntity<>(HttpStatus.OK);
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }
 
-    //prof
     @PostMapping("/prof")
-    ResponseEntity<?> creerProf(@RequestBody profRequest request){
-        String name = request.getName().toLowerCase() ;
-        String prenom = request.getPrenom().toLowerCase() ;
-        String email = name+prenom+"@test.com";
-        String password = request.getPassword();
-
-        RegistreRequest registre= RegistreRequest.builder()
-                .email(email)
-                .password(password)
-                .role(Role.Professor)
-                .build() ;
-
-        User user  = userRepository.findUserByEmail(email);
-        if(user!= null){
-            return new ResponseEntity<>(HttpStatus.IM_USED);
-        }
-        try{
-            authenticationService.register(registre) ;
-        }catch (Exception e){
+    ResponseEntity<?> creerProf(@RequestBody profRequest request) {
+        try {
+            return new ResponseEntity<>(adminService.creerProf(request), HttpStatus.OK);
+        } catch (ConflictException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        User userCreated = userRepository.findUserByEmail(email);
-
-        Professor professor = (Professor) Professor.builder()
-                .name(name)
-                .prenom(prenom)
-                .user(userCreated)
-                .build();
-
-        try{
-            professorRepository.save(professor) ;
-        }catch(Exception e){
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        return  new ResponseEntity<>("email : "+email,HttpStatus.OK) ;
     }
 
     @GetMapping("/profs")
-    ResponseEntity<?> getAllProfs(){
+    ResponseEntity<?> getAllProfs() {
         try {
-            List<Professor> professors = professorRepository.findAll();
-            return new ResponseEntity<>(professors, HttpStatus.OK);
+            return new ResponseEntity<>(adminService.getAllProfs(), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -145,9 +75,9 @@ public class AdministrtatorController {
     }
 
     @DeleteMapping("/profs/delete/{id}")
-    ResponseEntity<?> deleteProf(@PathVariable int id){
+    ResponseEntity<?> deleteProf(@PathVariable int id) {
         try {
-            professorRepository.deleteById(id);
+            adminService.deleteProf(id);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
@@ -156,17 +86,44 @@ public class AdministrtatorController {
     }
 
     @PutMapping("/profs/{id}")
-    ResponseEntity<?> updateProf(@PathVariable int id, @RequestBody profRequest request){
+    ResponseEntity<?> updateProf(@PathVariable int id, @RequestBody profRequest request) {
         try {
-            Professor professor = professorRepository.findById(id);
-            if(professor == null){
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
+            adminService.updateProf(id, request);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
-            professor.setName(request.getName().toLowerCase());
-            professor.setPrenom(request.getPrenom().toLowerCase());
-            professorRepository.save(professor);
+    @PostMapping("/student")
+    ResponseEntity<?> crateStiudent(@RequestBody studentRequest request) {
+        try {
+            return new ResponseEntity<>(adminService.creerStudent(request), HttpStatus.OK);
+        } catch (ConflictException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
+    @GetMapping("/students")
+    ResponseEntity<?> getAllStudent() {
+        try {
+            return new ResponseEntity<>(adminService.getAllStudents(), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/students/delete")
+    ResponseEntity<?> deleteStudent(@RequestParam int id) {
+        try {
+            adminService.deleteStudent(id);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
@@ -174,139 +131,34 @@ public class AdministrtatorController {
         }
     }
 
-    //student
-    @PostMapping("/student")
-    ResponseEntity<?> crateStiudent(@RequestBody studentRequest request){
-        String email = request.getName() +request.getPrenom() +"@test.com";
-         RegistreRequest registre = RegistreRequest.builder()
-                 .email(email)
-                 .password("123456")
-                 .role(Role.Student)
-                 .build() ;
-         if(studentRepository.findByCne(request.getCne()) != null){
-             return new ResponseEntity<>(HttpStatus.CONFLICT) ;
-         }
-         try{
-             authenticationService.register(registre) ;
-         }catch(Exception e){
-             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR) ;
-         }
-         try{
-             User user = userRepository.findUserByEmail(email) ;
-             Filiere filiere = filiereRepository.findById(request.getFiliereId());
-             Student student = Student.builder()
-                     .cni(request.getCni())
-                     .cne(request.getCne())
-                     .prenom(request.getPrenom())
-                     .name(request.getName())
-                     .user(user)
-                     .filiere(filiere).build();
-
-             studentRepository.save(student) ;
-         }catch (Exception e ){
-             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-         }
-
-         return new ResponseEntity<>(HttpStatus.OK);
-
-    }
-
-
-    @GetMapping("/students")
-    ResponseEntity<?> getAllStudent(){
-        try{
-            List<StudentResponse> students = studentRepository.findAll()
-                    .stream().map(
-                            m-> {
-                                return StudentResponse.builder()
-                                        .name(m.getName())
-                                        .prenom(m.getPrenom())
-                                        .email(m.getUser().getEmail())
-                                        .id(m.getId())
-                                        .cni(m.getCni())
-                                        .cne(m.getCne())
-                                        .filiereId(m.getFiliere() != null ? m.getFiliere().getId() : 0)
-                                        .filiereName(m.getFiliere() != null ? m.getFiliere().getName() : "")
-                                        .build();
-                            }
-                    ).toList();
-            return new ResponseEntity<>(students , HttpStatus.OK);
-        }catch (Exception e){
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @DeleteMapping("/students/delete")
-    ResponseEntity<?> deleteStudent(@RequestParam int id){
-        try {
-            studentRepository.deleteById(id);
-        }catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        return new ResponseEntity<>(HttpStatus.OK );
-    }
-
     @PutMapping("/students/{id}")
-    ResponseEntity<?> updateStudent(@PathVariable int id, @RequestBody studentRequest request){
-        try{
-            Student student = studentRepository.findById(id);
-            if(student == null){
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-
-            student.setName(request.getName());
-            student.setPrenom(request.getPrenom());
-            student.setCni(request.getCni());
-            student.setCne(request.getCne());
-
-            Filiere filiere = filiereRepository.findById(request.getFiliereId());
-            student.setFiliere(filiere);
-
-            studentRepository.save(student);
+    ResponseEntity<?> updateStudent(@PathVariable int id, @RequestBody studentRequest request) {
+        try {
+            adminService.updateStudent(id, request);
             return new ResponseEntity<>(HttpStatus.OK);
-        }catch(Exception e){
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    //module
     @PostMapping("/module")
-    ResponseEntity<?> createModule(@RequestBody moduleRequest request){
-
-        try{
-            Filiere  filiere = filiereRepository.findById(request.getFiliereId());
-            Professor prof = professorRepository.findById(request.getProfId());
-
-            Module module = Module.builder()
-                    .name(request.getName().toLowerCase())
-                    .description(request.getDescription().toLowerCase())
-                    .filiere(filiere)
-                    .teacher(prof)
-                    .dayOfWeek(request.getDayOfWeek())
-                    .timeSlot(request.getTimeSlot())
-                    .build();
-
-            moduleRepository.save(module);
-
-            System.out.println( "nice");
-        }catch(Exception e ){
+    ResponseEntity<?> createModule(@RequestBody moduleRequest request) {
+        try {
+            adminService.createModule(request);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
             e.printStackTrace();
-            System.out.println( "not nice");
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-
         }
-
-        return new ResponseEntity<>(HttpStatus.OK);
     }
-
 
     @DeleteMapping("/module/delete/{id}")
-    ResponseEntity<?> deleteModule(@PathVariable int id){
+    ResponseEntity<?> deleteModule(@PathVariable int id) {
         try {
-            moduleRepository.deleteById(id);
+            adminService.deleteModule(id);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
@@ -315,92 +167,34 @@ public class AdministrtatorController {
     }
 
     @GetMapping("/modules")
-    ResponseEntity<?> listAllModules(){
-        try{
-            List<Module> modules = moduleRepository.findAll();
-            List<ModuleResponse> modulesResponse = modules.stream().map(
-                    (m) ->ModuleResponse.builder()
-                            .id(m.getId())
-                            .name(m.getName())
-                            .description(m.getDescription())
-                            .profName(m.getTeacher().getPrenom())
-                            .filiereName(m.getFiliere().getName())
-                            .build()
-            ).toList();
-
-            return new ResponseEntity<>(modulesResponse ,HttpStatus.OK);
+    ResponseEntity<?> listAllModules() {
+        try {
+            return new ResponseEntity<>(adminService.listModules(), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-
-
-    //overview
-    @GetMapping("/overview/{filiereId}")
-    ResponseEntity<?> getALLfiliereDetails(@PathVariable int filiereId){
-        Filiere filiere = filiereRepository.findById(filiereId);
-        List<String> modules = filiere.getModules().stream().map(m -> m.getName()).toList();
-        List<String> professors = filiere.getModules().stream()
-                .map(m->m.getTeacher().getName()+" "+m.getTeacher().getPrenom())
-                .toList();
-        try{
-            OverviewFiliereResponse overview= OverviewFiliereResponse.builder()
-                    .etudiants(filiere.getStudents().stream()
-                            .map(e->StudentResponse.builder()
-                                    .id(e.getId())
-                                    .name(e.getName())
-                                    .prenom(e.getPrenom())
-                                    .email(e.getUser().getEmail())
-                                    .build()
-                            ).toList()
-                    )
-                    .professors(professors)
-                    .modules(modules)
-                    .build();
-
-            return new ResponseEntity<>(overview , HttpStatus.OK);
-        }catch(Exception e){
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    @GetMapping("/overview/{filiereId}")
+    ResponseEntity<?> getALLfiliereDetails(@PathVariable int filiereId) {
+        try {
+            return new ResponseEntity<>(adminService.getOverview(filiereId), HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @GetMapping("/available-slots/{filiereId}")
     ResponseEntity<?> getAvailableSlots(@PathVariable int filiereId) {
         try {
-            List<Module> existingModules = moduleRepository.findByFiliere_Id(filiereId);
-
-            List<AvailableSlotResponse> availableSlots = new ArrayList<>();
-
-            for (java.time.DayOfWeek day : java.time.DayOfWeek.values()) {
-                if (day == java.time.DayOfWeek.SUNDAY) continue; // no classes on Sunday
-
-                for (TimeSlot slot : TimeSlot.values()) {
-
-                    boolean taken = false;
-                    for (Module module : existingModules) {
-                        if (module.getDayOfWeek() == day && module.getTimeSlot() == slot) {
-                            taken = true;
-                            break;
-                        }
-                    }
-
-                    if (!taken) {
-                        availableSlots.add(AvailableSlotResponse.builder()
-                                .dayOfWeek(day)
-                                .timeSlot(slot)
-                                .build());
-                    }
-                }
-            }
-
-            return new ResponseEntity<>(availableSlots, HttpStatus.OK);
+            return new ResponseEntity<>(adminService.getAvailableSlots(filiereId), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 }

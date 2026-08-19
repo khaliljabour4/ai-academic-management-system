@@ -174,7 +174,6 @@ async function deleteFiliere(id) {
 async function creerProf(){
     const  name = document.getElementById("profLastName").value ; 
     const prenom = document.getElementById("profFirstName").value; 
-    const password = document.getElementById("profPassword").value ; 
 
     const response = await fetch("http://localhost:8080/api/v1/admin/prof" , 
         {
@@ -185,8 +184,7 @@ async function creerProf(){
             },
             body :JSON.stringify({
                 name : name ,
-                prenom : prenom ,  
-                password :password 
+                prenom : prenom
             })
         });
 
@@ -196,6 +194,10 @@ async function creerProf(){
          return 
     }
 
+    const created = await response.json();
+    window.alert("professeur cree\nemail : " + created.email + "\nmot de passe : " + created.password);
+    document.getElementById("profLastName").value = "";
+    document.getElementById("profFirstName").value = "";
 }
 
 const creerProfBtn = document.getElementById("createProfBtn");
@@ -322,7 +324,8 @@ async function createStudent(){
         window.alert("Student wasn't created");
         return;
     }
-    window.alert("Student created successfully");
+    const created = await response.json();
+    window.alert("etudiant cree\nemail : " + created.email + "\nmot de passe : " + created.password);
     clearStudentForm();
 }
 
@@ -493,9 +496,9 @@ async function fillOptionModule(){
     selectionProfModule.innerHTML = optionProfHtml ; 
 }
 
-const moduleSlotSelect = document.getElementById("moduleSlot");
 
 async function fillModuleSlotSelection(){
+    const moduleSlotSelect = document.getElementById("moduleSlot");
     const filiereId = document.getElementById("moduleFiliere").value;
     if(!filiereId){
         moduleSlotSelect.innerHTML = `<option value="">Choisis une filière d'abord</option>`;

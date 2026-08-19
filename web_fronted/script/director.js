@@ -152,6 +152,97 @@ document.getElementById("mlFiliereSelect").addEventListener("change", (event) =>
     loadRiskStudents(event.target.value);
 });
 
+async function loadFilieresOverview(){
+    const response = await fetch(`${API}/director/filieres-overview`, { headers: authHeaders() });
+    if(!response.ok) return;
+    const rows = await response.json();
+
+    const body = document.getElementById("filieresOverviewTableBody");
+    let html = "";
+    for(const f of rows){
+        html += `<tr>
+                    <td>${f.filiereName}</td>
+                    <td>${f.studentsCount}</td>
+                    <td>${f.professorsCount}</td>
+                    <td>${f.averageGrade != null ? f.averageGrade.toFixed(2) : "—"}</td>
+                    <td>${f.gradedCount}/${f.studentsCount}</td>
+                    <td>${f.atRiskCount > 0 ? `<span class="badge badge-danger">${f.atRiskCount}</span>` : "0"}</td>
+                </tr>`;
+    }
+    body.innerHTML = html || `<tr><td colspan="6">Aucune filière</td></tr>`;
+}
+
+async function fillPredictionsFiliereSelect(){
+    const filieres = await loadFilieres();
+    const select = document.getElementById("predictionsFiliereSelect");
+
+    let optionsHtml = "";
+    for(const f of filieres){
+        optionsHtml += `<option value="${f.id}">${f.name}</option>`;
+    }
+    select.innerHTML = optionsHtml;
+
+    if(filieres.length > 0){
+        await fillPredictionsModuleSelect(filieres[0].id);
+    }
+}
+
+async function fillPredictionsModuleSelect(filiereId){
+    const response = await fetch(`${API}/director/modules/${filiereId}`, { headers: authHeaders() });
+    if(!response.ok) return;
+    const modules = await response.json();
+
+    const select = document.getElementById("predictionsModuleSelect");
+    let optionsHtml = "";
+    for(const m of modules){
+        optionsHtml += `<option value="${m.id}">${m.name} — ${m.profName}</option>`;
+    }
+    select.innerHTML = optionsHtml || `<option value="">Aucun module</option>`;
+
+    if(modules.length > 0){
+        await loadEarlyPredictions(modules[0].id);
+    } else {
+        document.getElementById("predictionsTableBody").innerHTML = `<tr><td colspan="7">Aucun module dans cette filière</td></tr>`;
+    }
+}
+
+async function loadEarlyPredictions(moduleId){
+    const body = document.getElementById("predictionsTableBody");
+    if(!moduleId){
+        body.innerHTML = `<tr><td colspan="7">Aucun module sélectionné</td></tr>`;
+        return;
+    }
+
+    const response = await fetch(`${API}/director/predictions/${moduleId}`, { headers: authHeaders() });
+    if(!response.ok) return;
+    const rows = await response.json();
+
+    let html = "";
+    for(const r of rows){
+        const badgeClass = r.atRisk ? "badge-danger" : "badge-success";
+        html += `<tr>
+                    <td>${r.name} ${r.prenom}</td>
+                    <td>${r.note1 ?? "—"}</td>
+                    <td>${r.note2 ?? "—"}</td>
+                    <td>${r.note3 ?? "—"}</td>
+                    <td>${r.notesUsed}/3</td>
+                    <td>${r.confidence}</td>
+                    <td><span class="badge ${badgeClass}">${r.successRate != null ? r.successRate + "%" : "—"}</span></td>
+                </tr>`;
+    }
+    body.innerHTML = html || `<tr><td colspan="7">Aucune note saisie pour ce module pour l'instant</td></tr>`;
+}
+
+document.getElementById("predictionsFiliereSelect").addEventListener("change", (event) => {
+    fillPredictionsModuleSelect(event.target.value);
+});
+
+document.getElementById("predictionsModuleSelect").addEventListener("change", (event) => {
+    loadEarlyPredictions(event.target.value);
+});
+
 loadStats();
+loadFilieresOverview();
 fillFiliereSelect();
 fillMlFiliereSelect();
+fillPredictionsFiliereSelect();
