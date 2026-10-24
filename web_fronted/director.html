@@ -26,7 +26,7 @@
                 </button>
                 <button class="app-nav-btn" data-target="ml-dashboard">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.9 4.9l2.8 2.8"/><path d="M16.3 16.3l2.8 2.8"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.9 19.1l2.8-2.8"/><path d="M16.3 7.7l2.8-2.8"/><circle cx="12" cy="12" r="3.2"/></svg>
-                    Dashboard IA/ML
+                    Classes &amp; étudiants
                 </button>
                 <button class="app-nav-btn" data-target="predictions">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg>
@@ -144,89 +144,35 @@
                 <section class="app-section" id="ml-dashboard">
                     <div class="section-heading">
                         <div>
-                            <h1>Dashboard IA / Machine Learning</h1>
-                            <p>Maquette — à connecter au modèle plus tard</p>
-                        </div>
-                        <select id="mlFiliereSelect" style="min-width:220px;"></select>
-                    </div>
-
-                    <div class="ml-grid">
-                        <div class="card">
-                            <div class="card-title">Répartition des moyennes</div>
-                            <div class="ml-chart-placeholder" id="mlChartPlaceholder">
-                                <div class="ml-chart-bar" style="height:30%"></div>
-                                <div class="ml-chart-bar" style="height:55%"></div>
-                                <div class="ml-chart-bar" style="height:80%"></div>
-                                <div class="ml-chart-bar" style="height:65%"></div>
-                                <div class="ml-chart-bar" style="height:40%"></div>
-                                <div class="ml-chart-bar" style="height:20%"></div>
-                            </div>
-                            <div class="ml-chart-labels">
-                                <span>0-17%</span><span>17-33%</span><span>33-50%</span>
-                                <span>50-67%</span><span>67-83%</span><span>83-100%</span>
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <div class="card-title">État des modèles</div>
-                            <div class="model-status-card">
-                                <span class="model-status-dot off"></span>
-                                <div>
-                                    <strong>Prédiction de réussite</strong>
-                                    <div style="font-size:12px;color:var(--color-text-muted);">Règle simple ou scikit-learn — non branché</div>
-                                </div>
-                            </div>
-                            <div class="model-status-card">
-                                <span class="model-status-dot off"></span>
-                                <div>
-                                    <strong>Détection étudiants à risque</strong>
-                                    <div style="font-size:12px;color:var(--color-text-muted);">Basé sur assiduité + moyenne — non branché</div>
-                                </div>
-                            </div>
-                            <div class="model-status-card">
-                                <span class="model-status-dot off"></span>
-                                <div>
-                                    <strong>Assistant IA (FastAPI/LLM)</strong>
-                                    <div style="font-size:12px;color:var(--color-text-muted);">UI prête côté étudiant — non branché</div>
-                                </div>
-                            </div>
+                            <h1>Classes et étudiants</h1>
+                            <p>Réussite estimée par le modèle, classe par classe</p>
                         </div>
                     </div>
 
-                    <div class="card">
-                        <div class="card-title">Étudiants à risque (maquette)</div>
-                        <div id="riskStudentsList">
-                            <div class="risk-row">
-                                <span>— Aucune donnée tant que le modèle n'est pas branché —</span>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="cls-layout">
+                        <aside class="cls-list" id="classList"></aside>
 
-                    <div class="ai-panel">
-                        <div class="ai-panel-title">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.9 4.9l2.8 2.8"/><path d="M16.3 16.3l2.8 2.8"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.9 19.1l2.8-2.8"/><path d="M16.3 7.7l2.8-2.8"/><circle cx="12" cy="12" r="3.2"/></svg>
-                            Roadmap suggérée
-                        </div>
-                        <p style="margin:0 0 16px;color:var(--color-text-muted);font-size:13.5px;">
-                            Dans cet ordre, une fois le MVP stable.
-                        </p>
-                        <div class="ai-feature-list">
-                            <div class="ai-feature-card">
-                                <div class="ai-feature-head"><h4>1. Règle simple à risque</h4><span class="badge badge-ai">facile</span></div>
-                                <p>Si assiduité &lt; 50% ou moyenne &lt; 10 → marquer à risque. Zéro modèle nécessaire.</p>
+                        <div class="cls-detail">
+                            <div class="cls-head">
+                                <h2 id="clsName">—</h2>
+                                <div class="cls-stats">
+                                    <div><strong id="clsCount">—</strong><span>étudiants</span></div>
+                                    <div><strong id="clsRisk" class="is-danger">—</strong><span>à risque</span></div>
+                                    <div><strong id="clsAvg">—</strong><span>réussite moyenne</span></div>
+                                </div>
                             </div>
-                            <div class="ai-feature-card">
-                                <div class="ai-feature-head"><h4>2. Modèle scikit-learn</h4><span class="badge badge-ai">moyen</span></div>
-                                <p>Remplacer la règle par un modèle entraîné (joblib), servi par FastAPI.</p>
+
+                            <div class="cls-toolbar">
+                                <div class="cls-tabs" id="clsTabs">
+                                    <button class="active" data-filter="all">Tous</button>
+                                    <button data-filter="risk">À risque</button>
+                                    <button data-filter="watch">À surveiller</button>
+                                    <button data-filter="ok">Bien</button>
+                                </div>
+                                <input type="search" id="clsSearch" placeholder="Chercher un étudiant…">
                             </div>
-                            <div class="ai-feature-card">
-                                <div class="ai-feature-head"><h4>3. Assistant IA étudiant</h4><span class="badge badge-ai">moyen</span></div>
-                                <p>Brancher Conversation/Message à un LLM via FastAPI.</p>
-                            </div>
-                            <div class="ai-feature-card">
-                                <div class="ai-feature-head"><h4>4. Génération de cours/quiz</h4><span class="badge badge-ai">avancé</span></div>
-                                <p>Outils IA côté professeur — dernière étape de la roadmap.</p>
-                            </div>
+
+                            <div class="cls-students" id="classStudents"></div>
                         </div>
                     </div>
                 </section>

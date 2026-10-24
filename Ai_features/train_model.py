@@ -1,31 +1,41 @@
-import pandas as pd
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
+import json
+
 import joblib
+import pandas as pd
+from sklearn.dummy import DummyClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import roc_auc_score
+from sklearn.model_selection import train_test_split
 
 data = pd.read_csv("training_data.csv")
 y = data["reussite"]
 
-X1 = data[["note1"]]
-X2 = data[["note1", "note2"]]
-X3 = data[["note1", "note2", "note3"]]
+FEATURES = {
+    "success_model_1note.joblib": ["note1"],
+    "success_model_2notes.joblib": ["note1", "note2"],
+    "success_model.joblib": ["note1", "note2", "note3"],
+}
 
-X1_train, X1_test, y_train, y_test = train_test_split(X1, y, test_size=0.2, random_state=42)
-model1 = LogisticRegression()
-model1.fit(X1_train, y_train)
-print(f"accuracy (note1 only): {model1.score(X1_test, y_test)}")
-joblib.dump(model1, "success_model_1note.joblib")
+report = {}
+for filename, cols in FEATURES.items():
+    X_train, X_test, y_train, y_test = train_test_split(
+        data[cols], y, test_size=0.2, random_state=42, stratify=y
+    )
+    model = LogisticRegression().fit(X_train, y_train)
+    baseline = DummyClassifier(strategy="most_frequent").fit(X_train, y_train)
 
-X2_train, X2_test, _, _ = train_test_split(X2, y, test_size=0.2, random_state=42)
-model2 = LogisticRegression()
-model2.fit(X2_train, y_train)
-print(f"accuracy (note1+note2): {model2.score(X2_test, y_test)}")
-joblib.dump(model2, "success_model_2notes.joblib")
+    acc = model.score(X_test, y_test)
+    base = baseline.score(X_test, y_test)
+    auc = roc_auc_score(y_test, model.predict_proba(X_test)[:, 1])
+    report[f"{len(cols)} note(s)"] = {
+        "accuracy": round(acc, 3),
+        "baseline_accuracy": round(base, 3),
+        "roc_auc": round(auc, 3),
+        "test_rows": len(y_test),
+    }
+    print(f"{len(cols)} note(s): accuracy={acc:.3f}  baseline={base:.3f}  AUC={auc:.3f}  (n_test={len(y_test)})")
+    joblib.dump(model, filename)
 
-X3_train, X3_test, _, _ = train_test_split(X3, y, test_size=0.2, random_state=42)
-model3 = LogisticRegression()
-model3.fit(X3_train, y_train)
-print(f"accuracy (note1+note2+note3): {model3.score(X3_test, y_test)}")
-joblib.dump(model3, "success_model.joblib")
-
-print("saved success_model_1note.joblib, success_model_2notes.joblib, success_model.joblib")
+with open("metrics.json", "w") as f:
+    json.dump(report, f, indent=2)
+print("saved models + metrics.json")

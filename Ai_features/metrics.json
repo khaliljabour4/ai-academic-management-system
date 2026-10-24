@@ -1,0 +1,20 @@
+{
+  "1 note(s)": {
+    "accuracy": 0.84,
+    "baseline_accuracy": 0.67,
+    "roc_auc": 0.904,
+    "test_rows": 200
+  },
+  "2 note(s)": {
+    "accuracy": 0.86,
+    "baseline_accuracy": 0.67,
+    "roc_auc": 0.93,
+    "test_rows": 200
+  },
+  "3 note(s)": {
+    "accuracy": 0.905,
+    "baseline_accuracy": 0.67,
+    "roc_auc": 0.955,
+    "test_rows": 200
+  }
+}

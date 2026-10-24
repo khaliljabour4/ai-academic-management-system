@@ -40,7 +40,7 @@ document.getElementById("logoutBtn").addEventListener("click", logout);
 /* ---------- Filiere---------- */
 
 async function getAllFilliere() {
-    const response = await fetch("http://localhost:8080/api/v1/admin/filiere", {
+    const response = await fetch("/api/v1/admin/filiere", {
         headers: {
             "Content-Type": "application/json",
             "Authorization": localStorage.getItem("jwt"),
@@ -87,7 +87,7 @@ async function creerFiliere() {
         return;
     }
 
-    const response = await fetch("http://localhost:8080/api/v1/admin/filiere", {
+    const response = await fetch("/api/v1/admin/filiere", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -148,7 +148,7 @@ table.addEventListener("click", (event) => {
 });
 
 async function deleteFiliere(id) {
-    const response = await fetch(`http://localhost:8080/api/v1/admin/filiere?id=${id}`, {
+    const response = await fetch(`/api/v1/admin/filiere?id=${id}`, {
         method: "DELETE",
         headers: {
             "Authorization": localStorage.getItem("jwt")
@@ -174,8 +174,9 @@ async function deleteFiliere(id) {
 async function creerProf(){
     const  name = document.getElementById("profLastName").value ; 
     const prenom = document.getElementById("profFirstName").value; 
+    const password = document.getElementById("profPassword").value ; 
 
-    const response = await fetch("http://localhost:8080/api/v1/admin/prof" , 
+    const response = await fetch("/api/v1/admin/prof" , 
         {
             method :"POST" , 
             headers:{
@@ -184,7 +185,8 @@ async function creerProf(){
             },
             body :JSON.stringify({
                 name : name ,
-                prenom : prenom
+                prenom : prenom ,  
+                password :password 
             })
         });
 
@@ -194,10 +196,6 @@ async function creerProf(){
          return 
     }
 
-    const created = await response.json();
-    window.alert("professeur cree\nemail : " + created.email + "\nmot de passe : " + created.password);
-    document.getElementById("profLastName").value = "";
-    document.getElementById("profFirstName").value = "";
 }
 
 const creerProfBtn = document.getElementById("createProfBtn");
@@ -208,7 +206,7 @@ creerProfBtn.addEventListener('click' ,async ()=>{
 });
 
 async function getAllProfs() {
-    const response = await fetch("http://localhost:8080/api/v1/admin/profs", {
+    const response = await fetch("/api/v1/admin/profs", {
         headers: {
             "Authorization": localStorage.getItem("jwt")
         }
@@ -258,7 +256,7 @@ profRow.addEventListener("click", (event) => {
     deleteProf(button.value);
 });
 async function deleteProf(profId){
-    const response = await fetch (`http://localhost:8080/api/v1/admin/profs/delete/${profId}` , {
+    const response = await fetch (`/api/v1/admin/profs/delete/${profId}` , {
         method: "DELETE" , 
         headers:{
             "Authorization" : localStorage.getItem("jwt")
@@ -301,7 +299,7 @@ async function createStudent(){
     const  cne = document.getElementById("studentCNE");
     const filiereId = document.getElementById("studentFiliere").value;
 
-    const response = await fetch("http://localhost:8080/api/v1/admin/student", {
+    const response = await fetch("/api/v1/admin/student", {
     method: "POST",
     headers: {
         "Authorization": localStorage.getItem('jwt'),
@@ -324,8 +322,7 @@ async function createStudent(){
         window.alert("Student wasn't created");
         return;
     }
-    const created = await response.json();
-    window.alert("etudiant cree\nemail : " + created.email + "\nmot de passe : " + created.password);
+    window.alert("Student created successfully");
     clearStudentForm();
 }
 
@@ -337,7 +334,7 @@ async function updateStudent(id){
     const  cne = document.getElementById("studentCNE");
     const filiereID = document.getElementById("studentFiliere").value;
 
-    const response = await fetch(`http://localhost:8080/api/v1/admin/students/${id}`, {
+    const response = await fetch(`/api/v1/admin/students/${id}`, {
     method: "PUT",
     headers: {
         "Authorization": localStorage.getItem('jwt'),
@@ -384,7 +381,7 @@ function clearStudentForm(){
 }
 
 async function getAllStudent() {
-    const response = await fetch("http://localhost:8080/api/v1/admin/students", {
+    const response = await fetch("/api/v1/admin/students", {
         headers: {
             "Authorization": localStorage.getItem("jwt")
         }
@@ -455,7 +452,7 @@ studentRow.addEventListener("click", (event) => {
     }
 });
 async function deleteStudent(studentId){
-    const response = await fetch (`http://localhost:8080/api/v1/admin/students/delete?id=${studentId}` , {
+    const response = await fetch (`/api/v1/admin/students/delete?id=${studentId}` , {
         method: "DELETE" , 
         headers:{
             "Authorization" : localStorage.getItem("jwt")
@@ -505,7 +502,7 @@ async function fillModuleSlotSelection(){
         return;
     }
 
-    const response = await fetch(`http://localhost:8080/api/v1/admin/available-slots/${filiereId}`, {
+    const response = await fetch(`/api/v1/admin/available-slots/${filiereId}`, {
         headers: {
             "Authorization": localStorage.getItem("jwt")
         }
@@ -527,6 +524,7 @@ async function fillModuleSlotSelection(){
 document.getElementById("moduleFiliere").addEventListener("change", fillModuleSlotSelection);
 
 async function createModule (){
+    const moduleSlotSelect = document.getElementById("moduleSlot");
     const moduleName = document.getElementById("moduleName").value;
     const moduleDesc = document.getElementById("moduleDesc").value ;
     const profId = parseInt(document.getElementById("moduleProfessor").value);
@@ -540,7 +538,7 @@ async function createModule (){
 
     const [filiereDay, timeSlot] = slotValue.split("|");
 
-    const response = await fetch("http://localhost:8080/api/v1/admin/module", {
+    const response = await fetch("/api/v1/admin/module", {
     method: "POST",
     headers: {
         "Authorization": localStorage.getItem('jwt'),
@@ -569,7 +567,7 @@ async function createModule (){
 }
 
 async function getAllModule() {
-    const response = await fetch("http://localhost:8080/api/v1/admin/modules", {
+    const response = await fetch("/api/v1/admin/modules", {
         method: "GET",
         headers: {
             "Authorization": localStorage.getItem("jwt")
@@ -621,7 +619,7 @@ document.getElementById("moduleTableRows").addEventListener("click", (event) => 
 });
 
 async function deleteModule(id){
-    const response = await fetch(`http://localhost:8080/api/v1/admin/module/delete/${id}`, {
+    const response = await fetch(`/api/v1/admin/module/delete/${id}`, {
         method: "DELETE",
         headers: {
             "Authorization": localStorage.getItem("jwt")
@@ -677,7 +675,7 @@ async function getAllFiliereInfo(){
                         <th>student name</th>
                         <th>student prenom </th>
                     </tr>` ; 
-    const response = await fetch (`http://localhost:8080/api/v1/admin/overview/${filiereId}`,{
+    const response = await fetch (`/api/v1/admin/overview/${filiereId}`,{
         method: "GET",
         headers: {
             "Authorization": localStorage.getItem("jwt")

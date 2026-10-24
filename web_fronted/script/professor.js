@@ -41,7 +41,7 @@ document.getElementById("logoutBtn").addEventListener("click", logout);
 
 
 async function getProfessorModule(){
-    const response = await fetch("http://localhost:8080/api/v1/professor/modules" , {
+    const response = await fetch("/api/v1/professor/modules" , {
         headers:{
             "Authorization" : localStorage.getItem("jwt")
         }
@@ -86,7 +86,7 @@ async function getEtudiantsFiliere(){
     const table = document.getElementById("moduleGradesTable");
     let listEtudiantsHtml = `` ; 
 
-    const response = await fetch(`http://localhost:8080/api/v1/professor/students/${moduleId}` , {
+    const response = await fetch(`/api/v1/professor/students/${moduleId}` , {
         headers:{
             "Authorization" : localStorage.getItem("jwt") 
         }
@@ -166,7 +166,7 @@ async function saveGradeColumn(column){
 
     if(entries.length === 0) return;
 
-    const response = await fetch("http://localhost:8080/api/v1/professor/grades", {
+    const response = await fetch("/api/v1/professor/grades", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

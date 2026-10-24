@@ -1,4 +1,4 @@
-import { permitAccess, logout } from "./utile.js";
+import { permitAccess, logout, escapeHtml } from "./utile.js";
 
 permitAccess("Director");
 
@@ -32,7 +32,7 @@ document.getElementById("burgerMenuBtn").addEventListener("click", () => {
 
 document.getElementById("logoutBtn").addEventListener("click", logout);
 
-const API = "http://localhost:8080/api/v1";
+const API = "/api/v1";
 
 function authHeaders(){
     return { "Authorization": localStorage.getItem("jwt") };
@@ -103,53 +103,109 @@ document.getElementById("filiereOverviewSelect").addEventListener("change", (eve
     loadFiliereOverview(event.target.value);
 });
 
-async function fillMlFiliereSelect(){
-    const filieres = await loadFilieres();
-    const select = document.getElementById("mlFiliereSelect");
+/* ---------- Classes & étudiants ---------- */
 
-    let optionsHtml = "";
-    for(const f of filieres){
-        optionsHtml += `<option value="${f.id}">${f.name}</option>`;
-    }
-    select.innerHTML = optionsHtml;
+const classState = { filieres: [], overview: [], students: [], filter: "all", query: "" };
 
-    if(filieres.length > 0){
-        await loadRiskStudents(filieres[0].id);
-    }
+function tier(rate){
+    if(rate == null) return { key: "none", label: "—" };
+    if(rate < 50) return { key: "risk", label: "À risque" };
+    if(rate < 75) return { key: "watch", label: "À surveiller" };
+    return { key: "ok", label: "Bien" };
 }
 
-async function loadRiskStudents(filiereId){
-    const response = await fetch(`${API}/director/ml/${filiereId}`, { headers: authHeaders() });
-    if(!response.ok) return;
-    const students = await response.json();
+async function initClasses(){
+    const [filieres, overviewResponse] = await Promise.all([
+        loadFilieres(),
+        fetch(`${API}/director/filieres-overview`, { headers: authHeaders() })
+    ]);
+    classState.filieres = filieres;
+    classState.overview = overviewResponse.ok ? await overviewResponse.json() : [];
 
-    const riskList = document.getElementById("riskStudentsList");
-    const atRisk = students.filter(s => s.atRisk);
+    renderClassList(filieres.length > 0 ? filieres[0].id : null);
+    if(filieres.length > 0) await selectClass(filieres[0].id);
+}
 
-    let riskHtml = "";
-    for(const s of atRisk){
-        riskHtml += `<div class="risk-row">
-                    <span>${s.name} ${s.prenom}</span>
-                    <span>${s.successRate}% de réussite estimée</span>
-                </div>`;
+function renderClassList(activeId){
+    const list = document.getElementById("classList");
+    let html = "";
+    for(const f of classState.filieres){
+        const o = classState.overview.find(r => r.filiereName === f.name) || {};
+        const total = o.studentsCount ?? 0;
+        const risk = o.atRiskCount ?? 0;
+        const share = total > 0 ? Math.round((risk / total) * 100) : 0;
+        html += `<button class="cls-item ${f.id === activeId ? "active" : ""}" data-id="${f.id}">
+                    <div class="cls-item-top">
+                        <strong>${escapeHtml(f.name)}</strong>
+                        ${risk > 0 ? `<span class="cls-chip danger">${risk} à risque</span>` : `<span class="cls-chip ok">RAS</span>`}
+                    </div>
+                    <div class="cls-item-sub">${total} étudiants${o.averageGrade != null ? ` · moyenne ${o.averageGrade.toFixed(2)}` : ""}</div>
+                    <div class="cls-meter"><span style="width:${share}%"></span></div>
+                </button>`;
     }
-    riskList.innerHTML = riskHtml || `<div class="risk-row"><span>Aucun étudiant à risque détecté</span></div>`;
-
-    const buckets = [0, 0, 0, 0, 0, 0];
-    for(const s of students){
-        if(s.successRate == null) continue;
-        const index = Math.min(5, Math.floor(s.successRate / (100 / 6)));
-        buckets[index]++;
-    }
-    const maxCount = Math.max(1, ...buckets);
-    const bars = document.querySelectorAll("#mlChartPlaceholder .ml-chart-bar");
-    bars.forEach((bar, i) => {
-        bar.style.height = `${(buckets[i] / maxCount) * 100}%`;
+    list.innerHTML = html || `<p class="cls-empty">Aucune classe</p>`;
+    list.querySelectorAll(".cls-item").forEach(btn => {
+        btn.addEventListener("click", () => {
+            list.querySelectorAll(".cls-item").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            selectClass(Number(btn.dataset.id));
+        });
     });
 }
 
-document.getElementById("mlFiliereSelect").addEventListener("change", (event) => {
-    loadRiskStudents(event.target.value);
+async function selectClass(filiereId){
+    const response = await fetch(`${API}/director/ml/${filiereId}`, { headers: authHeaders() });
+    if(!response.ok) return;
+    const students = await response.json();
+    classState.students = students.slice().sort((a, b) => (a.successRate ?? 101) - (b.successRate ?? 101));
+
+    const f = classState.filieres.find(x => x.id === filiereId);
+    document.getElementById("clsName").textContent = f ? f.name : "";
+
+    const rated = students.filter(s => s.successRate != null);
+    const avg = rated.length ? rated.reduce((sum, s) => sum + s.successRate, 0) / rated.length : null;
+    document.getElementById("clsCount").textContent = students.length;
+    document.getElementById("clsRisk").textContent = students.filter(s => s.atRisk).length;
+    document.getElementById("clsAvg").textContent = avg != null ? `${avg.toFixed(0)} %` : "—";
+
+    renderClassStudents();
+}
+
+function renderClassStudents(){
+    const q = classState.query.trim().toLowerCase();
+    const rows = classState.students.filter(s => {
+        const matchesTier = classState.filter === "all" || tier(s.successRate).key === classState.filter;
+        const matchesQuery = q === "" || `${s.name} ${s.prenom}`.toLowerCase().includes(q);
+        return matchesTier && matchesQuery;
+    });
+
+    let html = "";
+    for(const s of rows){
+        const t = tier(s.successRate);
+        const initials = `${(s.prenom || "?")[0]}${(s.name || "")[0] || ""}`.toUpperCase();
+        html += `<div class="cls-row">
+                    <div class="cls-avatar ${t.key}">${escapeHtml(initials)}</div>
+                    <div class="cls-who">${escapeHtml(s.prenom)} <strong>${escapeHtml(s.name)}</strong></div>
+                    <div class="cls-bar"><span class="${t.key}" style="width:${s.successRate ?? 0}%"></span></div>
+                    <div class="cls-rate">${s.successRate != null ? Math.round(s.successRate) + " %" : "—"}</div>
+                    <span class="cls-tag ${t.key}">${t.label}</span>
+                </div>`;
+    }
+    document.getElementById("classStudents").innerHTML = html || `<p class="cls-empty">Aucun étudiant à afficher</p>`;
+}
+
+document.getElementById("clsTabs").addEventListener("click", (event) => {
+    const btn = event.target.closest("button");
+    if(!btn) return;
+    document.querySelectorAll("#clsTabs button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    classState.filter = btn.dataset.filter;
+    renderClassStudents();
+});
+
+document.getElementById("clsSearch").addEventListener("input", (event) => {
+    classState.query = event.target.value;
+    renderClassStudents();
 });
 
 async function loadFilieresOverview(){
@@ -244,5 +300,5 @@ document.getElementById("predictionsModuleSelect").addEventListener("change", (e
 loadStats();
 loadFilieresOverview();
 fillFiliereSelect();
-fillMlFiliereSelect();
+initClasses();
 fillPredictionsFiliereSelect();

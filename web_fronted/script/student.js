@@ -1,4 +1,4 @@
-import { permitAccess, logout } from "./utile.js";
+import { permitAccess, logout, escapeHtml } from "./utile.js";
 
 permitAccess("Student");
 
@@ -32,7 +32,7 @@ document.getElementById("burgerMenuBtn").addEventListener("click", () => {
 
 document.getElementById("logoutBtn").addEventListener("click", logout);
 
-const API = "http://localhost:8080/api/v1/student";
+const API = "/api/v1/student";
 
 function authHeaders(){
     return { "Authorization": localStorage.getItem("jwt") };
@@ -61,8 +61,8 @@ async function loadSchedule(){
             const entry = entries.find(e => e.dayOfWeek === day && e.timeSlot === slot);
             if(entry){
                 html += `<div class="schedule-cell filled">
-                            <div class="module-name">${entry.moduleName}</div>
-                            <div class="module-teacher">${entry.teacherName}</div>
+                            <div class="module-name">${escapeHtml(entry.moduleName)}</div>
+                            <div class="module-teacher">${escapeHtml(entry.teacherName)}</div>
                         </div>`;
             }else{
                 html += `<div class="schedule-cell"></div>`;
@@ -83,10 +83,10 @@ async function loadModules(){
     for(const m of modules){
         html += `<div class="module-card">
                     <div class="module-card-head">
-                        <h3>${m.name}</h3>
-                        <span class="badge badge-success">Prof. ${m.teacherName}</span>
+                        <h3>${escapeHtml(m.name)}</h3>
+                        <span class="badge badge-success">Prof. ${escapeHtml(m.teacherName)}</span>
                     </div>
-                    <p class="module-card-desc">${m.description ?? "Aucune description pour le moment"}</p>
+                    <p class="module-card-desc">${escapeHtml(m.description ?? "Aucune description pour le moment")}</p>
                 </div>`;
     }
     list.innerHTML = html || "<p>Aucun module pour le moment</p>";
@@ -95,7 +95,7 @@ async function loadModules(){
     let gradesHtml = "";
     for(const m of modules){
         gradesHtml += `<tr>
-                    <td>${m.name}</td>
+                    <td>${escapeHtml(m.name)}</td>
                     <td>${m.note1 ?? "—"}</td>
                     <td>${m.note2 ?? "—"}</td>
                     <td>${m.note3 ?? "—"}</td>
@@ -119,7 +119,7 @@ async function loadConversations(moduleId){
     const threadList = document.getElementById("threadList");
     let html = "";
     for(const c of conversations){
-        html += `<button class="chat-thread-item" data-id="${c.id}" data-title="${c.title}">${c.title}</button>`;
+        html += `<button class="chat-thread-item" data-id="${c.id}" data-title="${escapeHtml(c.title)}">${escapeHtml(c.title)}</button>`;
     }
     threadList.innerHTML = html || `<p style="padding:10px;color:var(--color-text-muted);font-size:13px;">Aucune conversation</p>`;
 
@@ -146,9 +146,9 @@ function renderMessages(messages){
     const chatMessages = document.getElementById("chatMessages");
     let html = "";
     for(let i = 0; i < messages.length; i += 2){
-        html += `<div class="chat-bubble question">${messages[i]}</div>`;
+        html += `<div class="chat-bubble question">${escapeHtml(messages[i])}</div>`;
         if(messages[i+1] !== undefined){
-            html += `<div class="chat-bubble response">${messages[i+1]}</div>`;
+            html += `<div class="chat-bubble response">${escapeHtml(messages[i+1])}</div>`;
         }
     }
     chatMessages.innerHTML = html;
@@ -217,7 +217,7 @@ async function init(){
     const moduleSelect = document.getElementById("moduleSelect");
     let optionsHtml = "";
     for(const m of modules){
-        optionsHtml += `<option value="${m.moduleId}">${m.name}</option>`;
+        optionsHtml += `<option value="${m.moduleId}">${escapeHtml(m.name)}</option>`;
     }
     moduleSelect.innerHTML = optionsHtml;
 

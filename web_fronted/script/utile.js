@@ -1,3 +1,11 @@
+// Local dev (Live Server on :5500): send /api/... calls to the backend on :8080.
+// Behind nginx (Docker/server) the same relative URLs are proxied, so nothing to change.
+if (["5500", "5501"].includes(window.location.port)) {
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = (url, options) =>
+        originalFetch(typeof url === "string" && url.startsWith("/api/") ? "http://localhost:8080" + url : url, options);
+}
+
 
 export function permitAccess(accessPageRole) {
     const token = localStorage.getItem('jwt');
@@ -22,6 +30,11 @@ export function logout() {
     window.location.href = "login.html";
 }
 
-
-
-
+export function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}

@@ -27,7 +27,7 @@ const extraFieldByRole = {
 };
 
 async function loadProfile() {
-    const response = await fetch("http://localhost:8080/api/v1/profile", {
+    const response = await fetch("/api/v1/profile", {
         headers: {
             "Authorization": localStorage.getItem("jwt")
         }
@@ -61,7 +61,7 @@ document.getElementById("saveInfoBtn").addEventListener("click", async () => {
     const name = document.getElementById("profileName").value;
     const prenom = document.getElementById("profilePrenom").value;
 
-    const response = await fetch("http://localhost:8080/api/v1/profile", {
+    const response = await fetch("/api/v1/profile", {
         method: "PUT",
         headers: {
             "Authorization": localStorage.getItem("jwt"),
@@ -90,7 +90,7 @@ document.getElementById("savePasswordBtn").addEventListener("click", async () =>
         return;
     }
 
-    const response = await fetch("http://localhost:8080/api/v1/profile", {
+    const response = await fetch("/api/v1/profile", {
         method: "PUT",
         headers: {
             "Authorization": localStorage.getItem("jwt"),

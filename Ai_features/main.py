@@ -7,7 +7,8 @@ import pandas as pd
 
 app = FastAPI()
 
-OLLAMA_URL = "http://localhost:11434/api/generate"
+OLLAMA_BASE = os.getenv("OLLAMA_BASE", "http://localhost:11434")
+OLLAMA_URL = f"{OLLAMA_BASE}/api/generate"
 MODEL_NAME = os.getenv("OLLAMA_MODEL", "llama3.2")
 
 success_model_1note = joblib.load("success_model_1note.joblib")
@@ -71,7 +72,7 @@ def ask(request: AskRequest):
 @app.get("/ai/health")
 def health():
     try:
-        requests.get("http://localhost:11434", timeout=3)
+        requests.get(OLLAMA_BASE, timeout=3)
         return {"ollama": "up"}
     except requests.exceptions.RequestException:
         return {"ollama": "down"}
