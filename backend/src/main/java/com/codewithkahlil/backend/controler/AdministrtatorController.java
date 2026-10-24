@@ -6,7 +6,7 @@ import com.codewithkahlil.backend.dto.requests.profRequest;
 import com.codewithkahlil.backend.dto.requests.studentRequest;
 import com.codewithkahlil.backend.exception.ConflictException;
 import com.codewithkahlil.backend.exception.NotFoundException;
-import com.codewithkahlil.backend.service.AdminService;
+import com.codewithkahlil.backend.service.AdminService ;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
